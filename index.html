@@ -34,7 +34,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .account-btn .comm{font-size:12px;color:var(--muted);margin-top:2px;}
 .account-btn.active .name{color:var(--accent);}
 .account-btn.active .comm{color:var(--accent-mid);}
-.type-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.type-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
 .type-btn{border:0.5px solid var(--border-md);border-radius:var(--radius);padding:10px 14px;cursor:pointer;background:var(--surface);text-align:left;transition:all 0.15s;}
 .type-btn:hover{background:var(--surface2);}
 .type-btn.active{border:2px solid var(--accent-mid);background:var(--accent-light);}
@@ -200,8 +200,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <button class="type-btn active" onclick="selectType(this,'pitched')">
         <div class="tname">Pitched</div><div class="tdesc">Full call — discovery + pitch + close</div>
       </button>
+      <button class="type-btn" onclick="selectType(this,'not_pitched')">
+        <div class="tname">Not Pitched</div><div class="tdesc">Call happened but no pitch was made</div>
+      </button>
       <button class="type-btn" onclick="selectType(this,'fdq')">
-        <div class="tname">FDQ</div><div class="tdesc">Fact-finding / discovery only, no pitch</div>
+        <div class="tname">FDQ</div><div class="tdesc">Fact-finding / discovery only</div>
       </button>
     </div>
   </div>
@@ -307,7 +310,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div class="filter-field"><label>Call type</label>
         <select id="f-type" onchange="renderDashboard()">
           <option value="">All types</option>
-          <option value="pitched">Pitched</option><option value="fdq">FDQ</option>
+          <option value="pitched">Pitched</option><option value="not_pitched">Not Pitched</option><option value="fdq">FDQ</option>
         </select>
       </div>
       <div class="filter-field"><label>Client</label>
@@ -449,7 +452,7 @@ async function runAnalysis(){
   document.getElementById('results').style.display='none';
 
   const refundAmt=parseFloat(document.getElementById('refund').value)||0;
-  const isFDQ=callType==='fdq';
+  const isFDQ=callType==='fdq'||callType==='not_pitched';
 
   const system=`You are an expert sales coach scoring calls using NEPQ, SPIN, and IFS frameworks.
 Return ONLY a valid JSON object — no markdown, no preamble.
