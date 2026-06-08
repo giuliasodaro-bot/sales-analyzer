@@ -264,10 +264,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
 
   <!-- Revenue KPIs -->
-  <div class="kpi-grid-3" id="rev-kpis">
+  <div class="kpi-grid-3" id="rev-kpis" style="grid-template-columns:repeat(4,1fr)">
     <div class="kpi active-rev"><div class="kpi-label">Active revenue</div><div class="kpi-val" id="kpi-active">$0</div><div class="kpi-sub">cash collected this month</div></div>
     <div class="kpi passive-rev"><div class="kpi-label">Passive revenue</div><div class="kpi-val" id="kpi-passive">$0</div><div class="kpi-sub">installments arriving</div></div>
     <div class="kpi total-rev"><div class="kpi-label">Total revenue</div><div class="kpi-val" id="kpi-total-rev">$0</div><div class="kpi-sub">active + passive</div></div>
+    <div class="kpi" style="border-color:#639922"><div class="kpi-label">Commission this month</div><div class="kpi-val" id="kpi-comm-month" style="color:var(--success)">$0</div><div class="kpi-sub">on cash collected</div></div>
   </div>
 
   <!-- Call KPIs -->
@@ -533,7 +534,7 @@ function renderResults(r){
   const s=r.scores;
   const labels={call_control:'Call control',discovery_spin:'Discovery SPIN',discovery_nepq:'Discovery NEPQ',belief_shifting:'Belief shifting',objection_handling:'Objection handling',pitch_effectiveness:'Pitch effectiveness',closing:'Closing',eq:'EQ',ifs_awareness:'IFS awareness'};
   const a=avgScore(s);
-  const commAmt=r.generatedRevenue?Math.round(r.generatedRevenue*r.comm/100):0;
+  const instCommAmt=r.cashCollected?Math.round(r.cashCollected*r.comm/100):0;
   const remaining=r.generatedRevenue&&r.installments>1?r.generatedRevenue-r.cashCollected:0;
 
   document.getElementById('r-overall-grid').innerHTML=`
@@ -542,7 +543,7 @@ function renderResults(r){
     <div class="stat"><div class="stat-label">Generated revenue</div><div class="stat-val" style="color:var(--accent)">${fmtMoney(r.generatedRevenue)}</div></div>
     <div class="stat"><div class="stat-label">Remaining to collect</div><div class="stat-val" style="color:var(--purple)">${fmtMoney(remaining)}</div></div>
     <div class="stat"><div class="stat-label">Installments</div><div class="stat-val">${r.installments||'—'}</div></div>
-    <div class="stat"><div class="stat-label">Est. commission</div><div class="stat-val" style="color:var(--success)">${fmtMoney(commAmt)}</div></div>`;
+    <div class="stat"><div class="stat-label">Commission today</div><div class="stat-val" style="color:var(--success)">${fmtMoney(instCommAmt)}</div></div>`;
 
   document.getElementById('score-grid').innerHTML=Object.entries(labels).map(([k,label])=>{
     const v=s[k]||0,c=cls(v);
@@ -578,7 +579,8 @@ function projectInstallments(call){
   for(let i=0;i<call.installments;i++){
     const d=new Date(callDate);
     d.setMonth(d.getMonth()+i);
-    rows.push({month:monthKey(d),amount:instAmt,collected:i===0});
+    const commAmt=Math.round(instAmt*call.comm/100);
+    rows.push({month:monthKey(d),amount:instAmt,commission:commAmt,collected:i===0});
   }
   return rows;
 }
@@ -606,26 +608,33 @@ function renderDashboard(){
   const now=nowMonthKey();
 
   // Revenue KPIs
-  let activeRev=0, passiveRev=0, totalGenerated=0;
-  const scheduleMap={}; // month -> {active, passive}
+  let activeRev=0, passiveRev=0, totalGenerated=0, activeComm=0, passiveComm=0;
+  const scheduleMap={}; // month -> {active, passive, commission}
 
   closed.forEach(c=>{
     totalGenerated+=c.generatedRevenue||0;
     const rows=projectInstallments(c);
     rows.forEach(r=>{
-      if(!scheduleMap[r.month]) scheduleMap[r.month]={active:0,passive:0};
+      if(!scheduleMap[r.month]) scheduleMap[r.month]={active:0,passive:0,commission:0};
       const callMonth=monthKey(new Date(c.timestamp));
-      if(r.month===callMonth) scheduleMap[r.month].active+=r.amount;
-      else scheduleMap[r.month].passive+=r.amount;
+      if(r.month===callMonth){
+        scheduleMap[r.month].active+=r.amount;
+        scheduleMap[r.month].commission+=r.commission;
+      } else {
+        scheduleMap[r.month].passive+=r.amount;
+        scheduleMap[r.month].commission+=r.commission;
+      }
     });
   });
 
   activeRev=(scheduleMap[now]?.active||0);
   passiveRev=(scheduleMap[now]?.passive||0);
+  activeComm=scheduleMap[now]?.commission||0;
 
   document.getElementById('kpi-active').textContent='$'+(activeRev).toLocaleString();
   document.getElementById('kpi-passive').textContent='$'+(passiveRev).toLocaleString();
   document.getElementById('kpi-total-rev').textContent='$'+(activeRev+passiveRev).toLocaleString();
+  document.getElementById('kpi-comm-month').textContent='$'+activeComm.toLocaleString();
   document.getElementById('kpi-calls').textContent=calls.length;
   document.getElementById('kpi-score').textContent=calls.length?Math.round(calls.reduce((s,c)=>s+avgScore(c.scores),0)/calls.length):'—';
   document.getElementById('kpi-generated').textContent='$'+totalGenerated.toLocaleString();
@@ -646,6 +655,7 @@ function renderDashboard(){
       return `<div class="installment-row">
         <span class="inst-month">${label}</span>
         <span class="inst-amount">$${total.toLocaleString()}</span>
+        <span style="font-size:12px;color:var(--success);font-weight:500">+$${scheduleMap[m].commission.toLocaleString()} comm</span>
         ${a?`<span class="inst-badge inst-collected">Active $${a.toLocaleString()}</span>`:''}
         ${p?`<span class="inst-badge inst-projected">Passive $${p.toLocaleString()}</span>`:''}
         ${isCurrent?'<span style="font-size:11px;color:var(--accent);font-weight:500">← current month</span>':''}
