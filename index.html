@@ -612,62 +612,64 @@ function renderDashboard(){
   var pitchedOnly=calls.filter(function(c){return c.callType==='pitched';});
   var fdqCalls=calls.filter(function(c){return c.callType==='fdq';});
 
-  // Build installment schedule from all closed calls
-  var schedMap={};
   var allClosed=loadCalls().filter(function(c){return (c.outcome||'').toLowerCase()==='closed';});
   var fa=document.getElementById('f-account')?document.getElementById('f-account').value:'';
-  var totalGenerated=0;
-  allClosed.forEach(function(c){
-    if(fa&&c.account!==fa) return;
-    var cDate=(c.dateClosed||c.timestamp||'').substring(0,10);
-    // Always build installment schedule regardless of date filter
-    projectInstallments(c).forEach(function(r){
-      if(!schedMap[r.month]) schedMap[r.month]={active:0,passive:0,commission:0};
-      var callMon=monthKey(new Date(c.timestamp));
-      if(r.month===callMon){schedMap[r.month].active+=r.amount;schedMap[r.month].commission+=r.commission;}
-      else{schedMap[r.month].passive+=r.amount;schedMap[r.month].commission+=r.commission;}
-    });
-    // Only count revenue generated within date filter
-    if(fd1&&cDate&&cDate<fd1) return;
-    if(fd2&&cDate&&cDate>fd2) return;
-    totalGenerated+=c.generatedRevenue||0;
-  });
-
-  // Cash/commission for selected period
   var noDateFilter=!fd1&&!fd2;
   var todayMonth=now;
-  var cashPeriod=0,cashPassive=0,commPeriod=0;
+  var cashPeriod=0,cashPassive=0,commPeriod=0,totalGenerated=0;
+
+  // Build passive installment schedule from ALL closed calls (for prev months calc)
+  // passiveMap[month] = {amount, commission} — only months AFTER the call date
+  var passiveMap={};
+  allClosed.forEach(function(c){
+    if(fa&&c.account!==fa) return;
+    projectInstallments(c).forEach(function(r){
+      if(!r.first){ // only passive (months 2+)
+        if(!passiveMap[r.month]) passiveMap[r.month]={amount:0,commission:0};
+        passiveMap[r.month].amount+=r.amount;
+        passiveMap[r.month].commission+=r.commission;
+      }
+    });
+  });
+
   if(noDateFilter){
-    // No date: sum cashCollected (first payments) + all passive installments due up to today
+    // CASH PERIOD: first payments from all closed calls + passive installments due up to today
+    // CASH PREV MONTHS: always $0
+    // COMMISSION: commission on all cash (active + passive) up to today
+    // REVENUE GENERATED: contracted value of all closed calls
     allClosed.forEach(function(c){
       if(fa&&c.account!==fa) return;
       cashPeriod+=c.cashCollected||0;
       commPeriod+=Math.round((c.cashCollected||0)*(c.comm||0)/100);
+      totalGenerated+=c.generatedRevenue||0;
     });
-    Object.keys(schedMap).forEach(function(m){
-      if(m<=todayMonth&&schedMap[m].passive>0){
-        cashPeriod+=schedMap[m].passive;
-        commPeriod+=schedMap[m].commission;
+    Object.keys(passiveMap).forEach(function(m){
+      if(m<=todayMonth){
+        cashPeriod+=passiveMap[m].amount;
+        commPeriod+=passiveMap[m].commission;
       }
     });
   } else {
-    // Sum cashCollected directly from closed calls within date range (covers single payments)
+    // CASH PERIOD: first payments (cashCollected) from closed calls within date range
+    // CASH PREV MONTHS: passive installments from calls closed BEFORE range but falling within range
+    // COMMISSION: commission on period cash + commission on prev months cash
+    // REVENUE GENERATED: contracted value of closed calls within date range
     allClosed.forEach(function(c){
       if(fa&&c.account!==fa) return;
       var cDate=(c.dateClosed||c.timestamp||'').substring(0,10);
       var cMon=cDate.substring(0,7);
       if(cMon>=rangeStart&&cMon<=rangeEnd){
+        // Call closed within selected range — count first payment and revenue
         cashPeriod+=c.cashCollected||0;
         commPeriod+=Math.round((c.cashCollected||0)*(c.comm||0)/100);
+        totalGenerated+=c.generatedRevenue||0;
       }
     });
-    // Add passive installments within range and prev months from recurring plans
-    Object.keys(schedMap).forEach(function(m){
+    // Passive installments from older calls falling within selected range
+    Object.keys(passiveMap).forEach(function(m){
       if(m>=rangeStart&&m<=rangeEnd){
-        cashPeriod+=schedMap[m].passive;
-        commPeriod+=schedMap[m].commission;
-      } else if(m<rangeStart&&m<=todayMonth){
-        cashPassive+=schedMap[m].passive;
+        cashPassive+=passiveMap[m].amount;
+        commPeriod+=passiveMap[m].commission;
       }
     });
   }
