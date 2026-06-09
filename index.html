@@ -907,14 +907,20 @@ async function importData(e){
       imported=JSON.parse(ev.target.result);
       if(!Array.isArray(imported)) throw new Error('Invalid format');
       var existing=loadCalls();
-      // Update existing records by ID, append truly new ones
       var importMap={};
       imported.forEach(function(c){importMap[c.id]=c;});
+      // Merge: imported fields win for matching IDs; keep existing records not in import
       var updatedIds=new Set();
       merged=existing.map(function(c){
         if(importMap[c.id]){
           updatedIds.add(c.id);
-          return Object.assign({},c,importMap[c.id]);
+          var imp=importMap[c.id];
+          var merged_rec=Object.assign({},c,imp);
+          // Always use imported strengths/improvements if they have content
+          if(imp.strengths&&imp.strengths.length) merged_rec.strengths=imp.strengths;
+          if(imp.improvements&&imp.improvements.length) merged_rec.improvements=imp.improvements;
+          if(imp.transcript) merged_rec.transcript=imp.transcript;
+          return merged_rec;
         }
         return c;
       });
