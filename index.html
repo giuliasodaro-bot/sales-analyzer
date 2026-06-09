@@ -269,7 +269,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div class="card-title" style="margin:0">Coaching synthesis</div>
       <button class="btn-fetch" id="btn-synth" onclick="synthesizeFeedback()">Generate insights</button>
     </div>
-    <div id="synth-content" style="font-size:13px;color:var(--muted)">Click "Generate insights" to synthesize coaching feedback across filtered calls.</div>
+    <div id="synth-content" style="font-size:13px;color:var(--muted);padding:8px 0">Click "Generate insights" to synthesize top strengths and improvements across the filtered calls.</div>
   </div>
   <!-- Avg scores -->
   <div class="card" id="agg-section" style="display:none">
@@ -633,6 +633,19 @@ function renderDashboard(){
 
   // Synth section
   document.getElementById('synth-section').style.display=calls.length?'block':'none';
+  // Load cached synth for current filter combo
+  var synthKey=getSynthKey(calls);
+  var cached=loadSynth(synthKey);
+  var sc=document.getElementById('synth-content');
+  if(sc){
+    if(cached){
+      renderFeedbackBox('synth-content',cached.strengths,cached.improvements);
+      document.getElementById('btn-synth').textContent='Refresh insights';
+    } else {
+      sc.innerHTML='<span style="font-size:13px;color:var(--muted)">Click \"Generate insights\" to synthesize top strengths and improvements across the filtered calls.</span>';
+      document.getElementById('btn-synth').textContent='Generate insights';
+    }
+  }
 
   // Aggregate scores
   var aggEl=document.getElementById('agg-section');
@@ -774,6 +787,14 @@ function deleteCall(){
   renderDashboard();
 }
 
+// SYNTH CACHE
+function getSynthKey(calls){
+  var ids=calls.map(function(c){return c.id;}).sort().join(',');
+  return 'synth_'+ids.substring(0,200);
+}
+function loadSynth(key){try{var d=localStorage.getItem(key);return d?JSON.parse(d):null;}catch(e){return null;}}
+function saveSynth(key,data){try{localStorage.setItem(key,JSON.stringify(data));}catch(e){}}
+
 // SYNTHESIZE FEEDBACK
 async function synthesizeFeedback(){
   var apiKey=document.getElementById('api-key').value.trim();
@@ -800,6 +821,8 @@ async function synthesizeFeedback(){
     var s=text.indexOf('{'),e=text.lastIndexOf('}');
     var parsed=JSON.parse(text.substring(s,e+1));
     renderFeedbackBox('synth-content',parsed.strengths,parsed.improvements);
+    saveSynth(getSynthKey(getFiltered()),parsed);
+    document.getElementById('btn-synth').textContent='Refresh insights';
   }catch(err){
     document.getElementById('synth-content').textContent='Error: '+err.message;
   }
