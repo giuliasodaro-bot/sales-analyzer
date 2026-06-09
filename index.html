@@ -313,12 +313,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
 
   <!-- Row 2: Call counts -->
-  <div class="kpi-grid" style="grid-template-columns:repeat(5,1fr);margin-bottom:1rem">
+  <div class="kpi-grid" style="grid-template-columns:repeat(6,1fr);margin-bottom:1rem">
     <div class="kpi"><div class="kpi-label">Calls booked</div><div class="kpi-val" id="kpi-booked">0</div></div>
     <div class="kpi"><div class="kpi-label">Calls taken</div><div class="kpi-val" id="kpi-taken">0</div></div>
     <div class="kpi"><div class="kpi-label">Calls pitched</div><div class="kpi-val" id="kpi-pitched">0</div></div>
     <div class="kpi"><div class="kpi-label">Calls closed</div><div class="kpi-val" id="kpi-closed-count" style="color:var(--success)">0</div></div>
     <div class="kpi"><div class="kpi-label">Calls FDQ</div><div class="kpi-val" id="kpi-fdq-count">0</div></div>
+    <div class="kpi"><div class="kpi-label">Avg calls / day</div><div class="kpi-val" id="kpi-avg-day">—</div><div class="kpi-sub" id="kpi-avg-day-sub"></div></div>
   </div>
 
   <!-- Row 3: Close rates -->
@@ -382,14 +383,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         </select>
       </div>
       <div class="field">
+        <label>Call date</label>
+        <input type="date" id="m-call-date"/>
+      </div>
+      <div class="field">
         <label>Date closed</label>
         <input type="date" id="m-date-closed"/>
       </div>
+    </div>
+    <div class="row3" style="margin-bottom:8px">
       <div class="field">
         <label>Cash collected</label>
         <div class="prefix-wrap"><span class="prefix">$</span><input type="number" id="m-cash" placeholder="0" min="0"/></div>
       </div>
-    </div>
     <div class="row3" style="margin-bottom:8px">
       <div class="field">
         <label>Revenue generated</label>
@@ -712,6 +718,26 @@ function renderDashboard(){
   document.getElementById('kpi-pitched').textContent=calledPitched.length;
   document.getElementById('kpi-closed-count').textContent=closed.length;
   document.getElementById('kpi-fdq-count').textContent=calledFDQ.length;
+
+  // Avg calls per day
+  const fd1=document.getElementById('f-date-from').value;
+  const fd2=document.getElementById('f-date-to').value;
+  if(fd1&&fd2&&calls.length){
+    const days=Math.max(1,Math.round((new Date(fd2)-new Date(fd1))/(1000*60*60*24))+1);
+    const avgPerDay=(calledTaken.length/days).toFixed(1);
+    document.getElementById('kpi-avg-day').textContent=avgPerDay;
+    document.getElementById('kpi-avg-day-sub').textContent=`over ${days} days`;
+  } else if(calls.length) {
+    // Use range from first to last call
+    const dates=calls.map(c=>new Date(c.timestamp)).sort((a,b)=>a-b);
+    const days=Math.max(1,Math.round((dates[dates.length-1]-dates[0])/(1000*60*60*24))+1);
+    const avgPerDay=(calledTaken.length/days).toFixed(1);
+    document.getElementById('kpi-avg-day').textContent=avgPerDay;
+    document.getElementById('kpi-avg-day-sub').textContent=`over ${days} days`;
+  } else {
+    document.getElementById('kpi-avg-day').textContent='—';
+    document.getElementById('kpi-avg-day-sub').textContent='';
+  }
   document.getElementById('kpi-generated').textContent='$'+totalGenerated.toLocaleString();
   // also update kpi-calls for any remaining references
   const kpiCallsEl=document.getElementById('kpi-calls');
@@ -871,6 +897,7 @@ function openModal(id){
   const outcomeEl=document.getElementById('m-outcome');
   const outcomeVal=(c.outcome||'unknown').toLowerCase();
   Array.from(outcomeEl.options).forEach(o=>o.selected=o.value===outcomeVal);
+  document.getElementById('m-call-date').value=c.timestamp?c.timestamp.substring(0,10):'';
   document.getElementById('m-date-closed').value=c.dateClosed||'';
   document.getElementById('m-cash').value=c.cashCollected||'';
   document.getElementById('m-revenue').value=c.generatedRevenue||'';
@@ -885,6 +912,7 @@ function updateCall(){
   const c=calls.find(x=>x.id===openCallId);
   if(!c) return;
   const newOutcome=document.getElementById('m-outcome').value;
+  const newCallDate=document.getElementById('m-call-date').value;
   const dateClosed=document.getElementById('m-date-closed').value;
   const newCash=parseFloat(document.getElementById('m-cash').value)||0;
   const newRevenue=parseFloat(document.getElementById('m-revenue').value)||0;
@@ -892,10 +920,10 @@ function updateCall(){
   const refundAmt=parseFloat(document.getElementById('m-refund-input').value)||0;
 
   c.outcome=newOutcome;
+  if(newCallDate) c.timestamp=newCallDate+'T12:00:00.000Z';
   if(dateClosed) {
     c.dateClosed=dateClosed;
-    // If closed, use dateClosed as the timestamp for installment scheduling
-    if(newOutcome==='closed') c.timestamp=dateClosed+'T12:00:00.000Z';
+    if(newOutcome==='closed'&&!newCallDate) c.timestamp=dateClosed+'T12:00:00.000Z';
   }
   const effectiveRefund=Math.min(refundAmt, newRevenue);
   c.generatedRevenue=newRevenue-effectiveRefund;
