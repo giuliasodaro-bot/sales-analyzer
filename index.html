@@ -861,20 +861,21 @@ function debugFix(){
   try{
     var calls=JSON.parse(localStorage.getItem('sales_calls')||'[]');
     var map={discovery_spin:'discovery_depth',discovery_nepq:'discovery_depth',closing:'closing_strength',eq:'eq_in_closing',ifs_awareness:null};
-    var fixed=0;
-    calls.forEach(function(c){
-      if(!c.scores) return;
-      Object.keys(map).forEach(function(ok){
-        if(c.scores[ok]!==undefined){
+    var report=[];
+    calls.forEach(function(c,i){
+      if(!c.scores){report.push('call '+i+': no scores');return;}
+      var keys=Object.keys(c.scores);
+      report.push('call '+i+' ('+c.client+'): '+keys.join(', '));
+      keys.forEach(function(ok){
+        if(map[ok]!==undefined){
           var nk=map[ok];
           if(nk&&!c.scores[nk]) c.scores[nk]=c.scores[ok];
           delete c.scores[ok];
-          fixed++;
         }
       });
     });
     localStorage.setItem('sales_calls',JSON.stringify(calls));
-    alert('Fixed '+fixed+' score keys across '+calls.length+' calls. Refreshing...');
+    alert('Score keys in your calls:\n'+report.slice(0,5).join('\n')+(report.length>5?'\n...('+report.length+' total)':''));
     renderDashboard();
   }catch(e){alert('Error: '+e.message);}
 }
