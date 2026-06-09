@@ -928,12 +928,12 @@ function exportData(){
   a.click();
 }
 
-async function importData(e){
+function importData(e){
   var file=e.target.files[0];
   if(!file) return;
   document.getElementById('import-input').value='';
   var reader=new FileReader();
-  reader.onload=async function(ev){
+  reader.onload=function(ev){
     var imported,merged;
     try{
       imported=JSON.parse(ev.target.result);
@@ -941,18 +941,16 @@ async function importData(e){
       var existing=loadCalls();
       var importMap={};
       imported.forEach(function(c){importMap[c.id]=c;});
-      // Merge: imported fields win for matching IDs; keep existing records not in import
       var updatedIds=new Set();
       merged=existing.map(function(c){
         if(importMap[c.id]){
           updatedIds.add(c.id);
           var imp=importMap[c.id];
-          var merged_rec=Object.assign({},c,imp);
-          // Always use imported strengths/improvements if they have content
-          if(imp.strengths&&imp.strengths.length) merged_rec.strengths=imp.strengths;
-          if(imp.improvements&&imp.improvements.length) merged_rec.improvements=imp.improvements;
-          if(imp.transcript) merged_rec.transcript=imp.transcript;
-          return merged_rec;
+          var rec=Object.assign({},c,imp);
+          if(imp.strengths&&imp.strengths.length) rec.strengths=imp.strengths;
+          if(imp.improvements&&imp.improvements.length) rec.improvements=imp.improvements;
+          if(imp.transcript) rec.transcript=imp.transcript;
+          return rec;
         }
         return c;
       });
@@ -961,54 +959,11 @@ async function importData(e){
       });
       merged.sort(function(a,b){return new Date(b.timestamp)-new Date(a.timestamp);});
       saveCalls(merged);
+      alert('Imported '+imported.length+' calls successfully.');
+      renderDashboard();
     }catch(err){
       alert('Import failed: '+err.message);
-      return;
     }
-    var needsBackfill=merged.filter(function(c){return !c.strengths||!c.strengths.length;});
-    if(!needsBackfill.length){
-      alert('Imported '+imported.length+' calls. All up to date.');
-      return;
-    }
-    var apiKey=document.getElementById('api-key').value.trim();
-    if(!apiKey){
-      alert('Imported '+imported.length+' calls. '+needsBackfill.length+' need backfill — enter API key and re-import.');
-      return;
-    }
-    if(!confirm('Imported '+imported.length+' calls. '+needsBackfill.length+' need backfill. Run now?')) return;
-    var prog=document.createElement('div');
-    prog.style.cssText='position:fixed;bottom:20px;right:20px;background:#185FA5;color:#fff;padding:12px 18px;border-radius:12px;font-size:13px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2)';
-    document.body.appendChild(prog);
-    var done=0;
-    for(var i=0;i<needsBackfill.length;i++){
-      var c=needsBackfill[i];
-      prog.textContent='Backfilling '+(done+1)+'/'+needsBackfill.length+'...';
-      try{
-        var src=c.transcript?'Transcript:\n'+c.transcript.substring(0,3000):'Feedback:\n'+(c.feedback||'')+'\nScores:'+JSON.stringify(c.scores||{});
-        var resp=await fetch('https://api.anthropic.com/v1/messages',{
-          method:'POST',
-          headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-          body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:400,
-            system:'Sales coach. Return ONLY valid JSON: {"strengths":["...","...","..."],"improvements":["...","...","..."]}',
-            messages:[{role:'user',content:src}]
-          })
-        });
-        var data=await resp.json();
-        if(!data.error){
-          var text=data.content.map(function(b){return b.text||'';}).join('');
-          var s=text.indexOf('{'),en=text.lastIndexOf('}');
-          if(s>-1&&en>-1){
-            var p=JSON.parse(text.substring(s,en+1));
-            c.strengths=p.strengths||[];
-            c.improvements=p.improvements||[];
-          }
-        }
-      }catch(err){console.warn('Backfill failed',c.id,err);}
-      done++;
-      saveCalls(merged);
-    }
-    prog.textContent='Done! '+done+' calls backfilled.';
-    setTimeout(function(){if(prog.parentNode)prog.parentNode.removeChild(prog);},3000);
   };
   reader.readAsText(file);
 }
