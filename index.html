@@ -211,7 +211,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <div class="dash-header">
     <h2>Dashboard</h2>
     <div style="display:flex;gap:6px">
-      <button class="btn-sm" onclick="debugMissing()">Check missing</button>
+      <button class="btn-sm" onclick="cleanDuplicates()">Remove duplicates</button>
       <button class="btn-sm" onclick="exportData()">↓ Export</button>
       <label class="btn-sm" style="cursor:pointer;margin:0">↑ Import<input type="file" accept=".json" id="import-input" onchange="importData(event)" style="display:none"/></label>
       <button class="btn-sm btn-danger" onclick="clearAll()">Clear all</button>
@@ -869,6 +869,15 @@ async function synthesizeFeedback(){
 }
 
 // EXPORT / IMPORT
+function cleanDuplicates(){
+  var calls=loadCalls();
+  var before=calls.length;
+  // Remove any records with fake IDs I generated (174xxx range from bad import)
+  var cleaned=calls.filter(function(c){return !String(c.id).startsWith('174');});
+  saveCalls(cleaned);
+  alert('Removed '+(before-cleaned.length)+' duplicate records. '+cleaned.length+' calls remain.');
+  renderDashboard();
+}
 function debugMissing(){
   var calls=JSON.parse(localStorage.getItem('sales_calls')||'[]');
   var missing=calls.filter(function(c){return !c.strengths||!c.strengths.length;});
@@ -898,8 +907,20 @@ async function importData(e){
       imported=JSON.parse(ev.target.result);
       if(!Array.isArray(imported)) throw new Error('Invalid format');
       var existing=loadCalls();
-      var existingIds=new Set(existing.map(function(c){return c.id;}));
-      merged=[...existing,...imported.filter(function(c){return !existingIds.has(c.id);})];
+      // Update existing records by ID, append truly new ones
+      var importMap={};
+      imported.forEach(function(c){importMap[c.id]=c;});
+      var updatedIds=new Set();
+      merged=existing.map(function(c){
+        if(importMap[c.id]){
+          updatedIds.add(c.id);
+          return Object.assign({},c,importMap[c.id]);
+        }
+        return c;
+      });
+      imported.forEach(function(c){
+        if(!updatedIds.has(c.id)) merged.push(c);
+      });
       merged.sort(function(a,b){return new Date(b.timestamp)-new Date(a.timestamp);});
       saveCalls(merged);
     }catch(err){
