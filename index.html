@@ -101,8 +101,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .dash-header h2{font-size:20px;font-weight:600;}
 .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1rem;}
 .kpi-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1rem;}
-.kpi{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:14px;}
-.kpi-label{font-size:11px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.05em;}
+.kpi{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:14px;display:flex;flex-direction:column;}
+.kpi-label{font-size:11px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.05em;min-height:28px;display:flex;align-items:flex-end;}
 .kpi-val{font-size:22px;font-weight:600;color:var(--accent);}
 .kpi-sub{font-size:11px;color:var(--muted);margin-top:2px;}
 .kpi.active-rev .kpi-val{color:var(--success);}
@@ -305,7 +305,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:1rem">
     <div class="kpi active-rev"><div class="kpi-label">Cash collected</div><div class="kpi-val" id="kpi-active">$0</div><div class="kpi-sub">this month</div></div>
     <div class="kpi passive-rev"><div class="kpi-label">Cash collected</div><div class="kpi-val" id="kpi-passive">$0</div><div class="kpi-sub">from previous months</div></div>
-    <div class="kpi total-rev"><div class="kpi-label">Cash collected</div><div class="kpi-val" id="kpi-total-rev">$0</div><div class="kpi-sub">current month + year</div></div>
+    <div class="kpi" style="border-color:#639922"><div class="kpi-label">Commission this month</div><div class="kpi-val" id="kpi-total-rev" style="color:var(--success)">$0</div><div class="kpi-sub">active + passive</div></div>
     <div class="kpi"><div class="kpi-label">Revenue generated</div><div class="kpi-val" id="kpi-generated">$0</div><div class="kpi-sub">total contract value</div></div>
   </div>
 
@@ -367,15 +367,43 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="phase-grid" id="m-phases"></div>
     <div class="modal-section">Coaching feedback</div>
     <div class="feedback-box" id="m-feedback"></div>
-    <div class="modal-section">Refund</div>
-    <div class="refund-row">
+    <div class="modal-section">Update call</div>
+    <div class="row3" style="margin-bottom:8px">
       <div class="field">
-        <div class="prefix-wrap"><span class="prefix">$</span><input type="number" id="m-refund-input" placeholder="Enter refund amount" min="0"/></div>
+        <label>Outcome</label>
+        <select id="m-outcome">
+          <option value="closed">Closed</option>
+          <option value="no_close">No close</option>
+          <option value="follow_up">Follow up</option>
+          <option value="unknown">Unknown</option>
+        </select>
       </div>
-      <button class="btn-refund" onclick="applyRefund()">Apply refund</button>
+      <div class="field">
+        <label>Date closed</label>
+        <input type="date" id="m-date-closed"/>
+      </div>
+      <div class="field">
+        <label>Cash collected</label>
+        <div class="prefix-wrap"><span class="prefix">$</span><input type="number" id="m-cash" placeholder="0" min="0"/></div>
+      </div>
     </div>
+    <div class="row3" style="margin-bottom:8px">
+      <div class="field">
+        <label>Revenue generated</label>
+        <div class="prefix-wrap"><span class="prefix">$</span><input type="number" id="m-revenue" placeholder="0" min="0"/></div>
+      </div>
+      <div class="field">
+        <label>Installments</label>
+        <input type="number" id="m-installments" placeholder="1" min="1"/>
+      </div>
+      <div class="field">
+        <label>Refund</label>
+        <div class="prefix-wrap"><span class="prefix">$</span><input type="number" id="m-refund-input" placeholder="0" min="0"/></div>
+      </div>
+    </div>
+    <button class="btn-save" style="margin-bottom:8px" onclick="updateCall()">Save updates</button>
     <div class="status" id="m-refund-status"></div>
-    <div style="margin-top:10px">
+    <div style="margin-top:6px">
       <button class="btn-sm btn-danger" onclick="deleteCall()">Delete this call</button>
     </div>
   </div>
@@ -659,7 +687,7 @@ function renderDashboard(){
   });
   document.getElementById('kpi-active').textContent='$'+(activeRev).toLocaleString();
   document.getElementById('kpi-passive').textContent='$'+(passiveRev).toLocaleString();
-  document.getElementById('kpi-total-rev').textContent='$'+ytdCash.toLocaleString();
+  document.getElementById('kpi-total-rev').textContent='$'+(scheduleMap[now]?.commission||0).toLocaleString();
   const kpiCommEl=document.getElementById('kpi-comm-month');
   if(kpiCommEl) kpiCommEl.textContent='$'+activeComm.toLocaleString();
   // Row 2: call counts
@@ -826,23 +854,54 @@ function openModal(id){
   ).join('');
 
   document.getElementById('m-feedback').textContent=c.feedback||'';
+  // Pre-fill update fields
+  const outcomeEl=document.getElementById('m-outcome');
+  const outcomeVal=(c.outcome||'unknown').toLowerCase();
+  Array.from(outcomeEl.options).forEach(o=>o.selected=o.value===outcomeVal);
+  document.getElementById('m-date-closed').value=c.dateClosed||'';
+  document.getElementById('m-cash').value=c.cashCollected||'';
+  document.getElementById('m-revenue').value=c.generatedRevenue||'';
+  document.getElementById('m-installments').value=c.installments||'';
   document.getElementById('m-refund-input').value=c.refund||'';
   document.getElementById('m-refund-status').textContent='';
   document.getElementById('modal').classList.add('open');
 }
 
-function applyRefund(){
+function updateCall(){
   const calls=loadCalls();
   const c=calls.find(x=>x.id===openCallId);
   if(!c) return;
+  const newOutcome=document.getElementById('m-outcome').value;
+  const dateClosed=document.getElementById('m-date-closed').value;
+  const newCash=parseFloat(document.getElementById('m-cash').value)||0;
+  const newRevenue=parseFloat(document.getElementById('m-revenue').value)||0;
+  const newInstallments=parseInt(document.getElementById('m-installments').value)||1;
   const refundAmt=parseFloat(document.getElementById('m-refund-input').value)||0;
-  const originalGen=c.generatedRevenue+(c.refund||0); // recover original
-  const originalCash=refundAmt>=originalGen?0:(c.cashCollected+(c.refund||0)>originalGen?originalGen:c.cashCollected+(c.refund||0));
-  c.refund=Math.min(refundAmt,originalGen);
-  c.generatedRevenue=originalGen-c.refund;
-  c.cashCollected=c.refund>=originalGen?0:Math.min(originalCash,c.generatedRevenue);
+
+  c.outcome=newOutcome;
+  if(dateClosed) {
+    c.dateClosed=dateClosed;
+    // If closed, use dateClosed as the timestamp for installment scheduling
+    if(newOutcome==='closed') c.timestamp=dateClosed+'T12:00:00.000Z';
+  }
+  const effectiveRefund=Math.min(refundAmt, newRevenue);
+  c.generatedRevenue=newRevenue-effectiveRefund;
+  c.cashCollected=effectiveRefund>=newRevenue?0:newCash;
+  c.installments=newInstallments;
+  c.refund=effectiveRefund;
+
   saveCalls(calls);
-  setStatus('m-refund-status','Refund applied ✓','success');
+  setStatus('m-refund-status','Updated ✓','success');
+  // Refresh modal stats
+  const remaining=c.generatedRevenue&&c.installments>1?c.generatedRevenue-c.cashCollected:0;
+  const commAmt=c.cashCollected?Math.round(c.cashCollected*c.comm/100):0;
+  document.getElementById('m-overall').innerHTML=`
+    <div class="stat"><div class="stat-label">Score</div><div class="stat-val" style="color:var(--accent)">${avgScore(c.scores)}</div></div>
+    <div class="stat"><div class="stat-label">Cash collected</div><div class="stat-val" style="color:var(--success)">${fmtMoney(c.cashCollected)}</div></div>
+    <div class="stat"><div class="stat-label">Generated revenue</div><div class="stat-val">${fmtMoney(c.generatedRevenue)}</div></div>
+    <div class="stat"><div class="stat-label">Remaining</div><div class="stat-val" style="color:var(--purple)">${fmtMoney(remaining)}</div></div>
+    <div class="stat"><div class="stat-label">Installments</div><div class="stat-val">${c.installments||'—'}</div></div>
+    <div class="stat"><div class="stat-label">Commission</div><div class="stat-val" style="color:var(--success)">${fmtMoney(commAmt)}</div></div>`;
   renderDashboard();
 }
 
