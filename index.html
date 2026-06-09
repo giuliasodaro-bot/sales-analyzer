@@ -566,7 +566,10 @@ function saveCall(){
 
 // INSTALLMENT PROJECTION
 function projectInstallments(call){
+  // No installments to project if not closed, no revenue, or paid in full (cash == revenue)
   if(!call.generatedRevenue||!call.installments||call.installments<=0) return [];
+  if(call.cashCollected>=call.generatedRevenue) return [];
+  if(call.installments===1) return [];
   var instAmt=Math.round(call.generatedRevenue/call.installments);
   var commAmt=Math.round(instAmt*(call.comm||0)/100);
   var callDate=new Date(call.timestamp);
