@@ -273,41 +273,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     </div>
   </div>
 
-  <!-- Revenue KPIs -->
-  <div class="kpi-grid-3" id="rev-kpis" style="grid-template-columns:repeat(4,1fr)">
-    <div class="kpi active-rev"><div class="kpi-label">Active revenue</div><div class="kpi-val" id="kpi-active">$0</div><div class="kpi-sub">cash collected this month</div></div>
-    <div class="kpi passive-rev"><div class="kpi-label">Passive revenue</div><div class="kpi-val" id="kpi-passive">$0</div><div class="kpi-sub">installments arriving</div></div>
-    <div class="kpi total-rev"><div class="kpi-label">Total revenue</div><div class="kpi-val" id="kpi-total-rev">$0</div><div class="kpi-sub">active + passive</div></div>
-    <div class="kpi" style="border-color:#639922"><div class="kpi-label">Commission this month</div><div class="kpi-val" id="kpi-comm-month" style="color:var(--success)">$0</div><div class="kpi-sub">on cash collected</div></div>
-  </div>
-
-  <!-- Call KPIs row 1 -->
-  <div class="kpi-grid">
-    <div class="kpi"><div class="kpi-label">Total calls</div><div class="kpi-val" id="kpi-calls">0</div></div>
-    <div class="kpi"><div class="kpi-label">Avg score</div><div class="kpi-val" id="kpi-score">—</div></div>
-    <div class="kpi"><div class="kpi-label">Generated revenue</div><div class="kpi-val" id="kpi-generated">$0</div><div class="kpi-sub">total contract value</div></div>
-    <div class="kpi"><div class="kpi-label">Close rate (all booked)</div><div class="kpi-val" id="kpi-cr-booked">—</div><div class="kpi-sub" id="kpi-cr-booked-sub"></div></div>
-  </div>
-  <!-- Call KPIs row 2 -->
-  <div class="kpi-grid" style="margin-bottom:1rem">
-    <div class="kpi"><div class="kpi-label">Close rate (showed)</div><div class="kpi-val" id="kpi-cr-showed">—</div><div class="kpi-sub" id="kpi-cr-showed-sub"></div></div>
-    <div class="kpi"><div class="kpi-label">Close rate (pitched incl. FDQ)</div><div class="kpi-val" id="kpi-cr-pitched-all">—</div><div class="kpi-sub" id="kpi-cr-pitched-all-sub"></div></div>
-    <div class="kpi"><div class="kpi-label">Close rate (pitched excl. FDQ)</div><div class="kpi-val" id="kpi-cr-pitched-excl">—</div><div class="kpi-sub" id="kpi-cr-pitched-excl-sub"></div></div>
-    <div class="kpi" style="visibility:hidden"></div>
-  </div>
-
-  <!-- Installment projections -->
-  <div class="revenue-section" id="installment-section" style="display:none">
-    <div class="revenue-title">Revenue schedule — projected installments</div>
-    <div id="installment-list"></div>
-  </div>
-
-  <!-- Loss analysis -->
-  <div class="loss-section" id="loss-section" style="display:none">
-    <div class="loss-title">Where you're losing calls</div>
-    <div id="loss-chart"></div>
-  </div>
-
   <!-- Filters -->
   <div class="filters-card">
     <div class="filters-row">
@@ -336,6 +301,37 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     </div>
   </div>
 
+  <!-- Row 1: Revenue -->
+  <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:1rem">
+    <div class="kpi active-rev"><div class="kpi-label">Cash collected</div><div class="kpi-val" id="kpi-active">$0</div><div class="kpi-sub">this month</div></div>
+    <div class="kpi passive-rev"><div class="kpi-label">Cash collected</div><div class="kpi-val" id="kpi-passive">$0</div><div class="kpi-sub">from previous months</div></div>
+    <div class="kpi total-rev"><div class="kpi-label">Cash collected</div><div class="kpi-val" id="kpi-total-rev">$0</div><div class="kpi-sub">current month + year</div></div>
+    <div class="kpi"><div class="kpi-label">Revenue generated</div><div class="kpi-val" id="kpi-generated">$0</div><div class="kpi-sub">total contract value</div></div>
+  </div>
+
+  <!-- Row 2: Call counts -->
+  <div class="kpi-grid" style="grid-template-columns:repeat(5,1fr);margin-bottom:1rem">
+    <div class="kpi"><div class="kpi-label">Calls booked</div><div class="kpi-val" id="kpi-booked">0</div></div>
+    <div class="kpi"><div class="kpi-label">Calls taken</div><div class="kpi-val" id="kpi-taken">0</div></div>
+    <div class="kpi"><div class="kpi-label">Calls pitched</div><div class="kpi-val" id="kpi-pitched">0</div></div>
+    <div class="kpi"><div class="kpi-label">Calls closed</div><div class="kpi-val" id="kpi-closed-count" style="color:var(--success)">0</div></div>
+    <div class="kpi"><div class="kpi-label">Calls FDQ</div><div class="kpi-val" id="kpi-fdq-count">0</div></div>
+  </div>
+
+  <!-- Row 3: Close rates -->
+  <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:1rem">
+    <div class="kpi"><div class="kpi-label">Close rate (all booked)</div><div class="kpi-val" id="kpi-cr-booked">—</div><div class="kpi-sub" id="kpi-cr-booked-sub"></div></div>
+    <div class="kpi"><div class="kpi-label">Close rate (showed)</div><div class="kpi-val" id="kpi-cr-showed">—</div><div class="kpi-sub" id="kpi-cr-showed-sub"></div></div>
+    <div class="kpi"><div class="kpi-label">Close rate (pitched incl. FDQ)</div><div class="kpi-val" id="kpi-cr-pitched-all">—</div><div class="kpi-sub" id="kpi-cr-pitched-all-sub"></div></div>
+    <div class="kpi"><div class="kpi-label">Close rate (pitched excl. FDQ)</div><div class="kpi-val" id="kpi-cr-pitched-excl">—</div><div class="kpi-sub" id="kpi-cr-pitched-excl-sub"></div></div>
+  </div>
+
+  <!-- Loss analysis -->
+  <div class="loss-section" id="loss-section" style="display:none">
+    <div class="loss-title">Where you're losing calls</div>
+    <div id="loss-chart"></div>
+  </div>
+
   <!-- Aggregate scores -->
   <div id="agg-section" style="display:none;margin-bottom:1rem;">
     <div class="card">
@@ -348,6 +344,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
   <div class="card" style="padding:0;overflow:hidden">
     <div id="calls-list"></div>
+  </div>
+
+  <!-- Installment projections at bottom -->
+  <div class="revenue-section" id="installment-section" style="display:none;margin-top:1rem">
+    <div class="revenue-title">Revenue schedule — projected installments</div>
+    <div id="installment-list"></div>
   </div>
 </div>
 
@@ -649,30 +651,42 @@ function renderDashboard(){
   passiveRev=(scheduleMap[now]?.passive||0);
   activeComm=scheduleMap[now]?.commission||0;
 
+  // Year to date cash collected
+  const nowYear=new Date().getFullYear().toString();
+  let ytdCash=0;
+  Object.keys(scheduleMap).forEach(m=>{
+    if(m.startsWith(nowYear)) ytdCash+=scheduleMap[m].active+scheduleMap[m].passive;
+  });
   document.getElementById('kpi-active').textContent='$'+(activeRev).toLocaleString();
   document.getElementById('kpi-passive').textContent='$'+(passiveRev).toLocaleString();
-  document.getElementById('kpi-total-rev').textContent='$'+(activeRev+passiveRev).toLocaleString();
-  document.getElementById('kpi-comm-month').textContent='$'+activeComm.toLocaleString();
-  document.getElementById('kpi-calls').textContent=calls.length;
-  document.getElementById('kpi-score').textContent=calls.length?Math.round(calls.reduce((s,c)=>s+avgScore(c.scores),0)/calls.length):'—';
+  document.getElementById('kpi-total-rev').textContent='$'+ytdCash.toLocaleString();
+  const kpiCommEl=document.getElementById('kpi-comm-month');
+  if(kpiCommEl) kpiCommEl.textContent='$'+activeComm.toLocaleString();
+  // Row 2: call counts
+  const calledTaken=calls.filter(c=>c.callType!=='no_show');
+  const calledPitched=calls.filter(c=>c.callType==='pitched'||c.callType==='fdq');
+  const calledFDQ=calls.filter(c=>c.callType==='fdq');
+  document.getElementById('kpi-booked').textContent=calls.length;
+  document.getElementById('kpi-taken').textContent=calledTaken.length;
+  document.getElementById('kpi-pitched').textContent=calledPitched.length;
+  document.getElementById('kpi-closed-count').textContent=closed.length;
+  document.getElementById('kpi-fdq-count').textContent=calledFDQ.length;
   document.getElementById('kpi-generated').textContent='$'+totalGenerated.toLocaleString();
-  const noShows=calls.filter(c=>c.callType==='no_show');
-  const showed=calls.filter(c=>c.callType!=='no_show');
-  const pitchedInclFDQ=calls.filter(c=>c.callType==='pitched'||c.callType==='fdq');
-  const pitchedExclFDQ=calls.filter(c=>c.callType==='pitched');
-  const closedAll=closed;
-
-  const cr=(num,den)=>den.length?Math.round(closedAll.filter(c=>den.includes(c)).length/den.length*100)+'%':'—';
-  const crSub=(num,den,label)=>den.length?`${closedAll.filter(c=>den.includes(c)).length} of ${den.length} ${label}`:'';
-
-  document.getElementById('kpi-cr-booked').textContent=cr(closedAll,calls);
-  document.getElementById('kpi-cr-booked-sub').textContent=crSub(closedAll,calls,'booked');
-  document.getElementById('kpi-cr-showed').textContent=cr(closedAll,showed);
-  document.getElementById('kpi-cr-showed-sub').textContent=crSub(closedAll,showed,'showed');
-  document.getElementById('kpi-cr-pitched-all').textContent=cr(closedAll,pitchedInclFDQ);
-  document.getElementById('kpi-cr-pitched-all-sub').textContent=crSub(closedAll,pitchedInclFDQ,'pitched');
-  document.getElementById('kpi-cr-pitched-excl').textContent=cr(closedAll,pitchedExclFDQ);
-  document.getElementById('kpi-cr-pitched-excl-sub').textContent=crSub(closedAll,pitchedExclFDQ,'pitched');
+  // also update kpi-calls for any remaining references
+  const kpiCallsEl=document.getElementById('kpi-calls');
+  if(kpiCallsEl) kpiCallsEl.textContent=calls.length;
+  const kpiScoreEl=document.getElementById('kpi-score');
+  if(kpiScoreEl) kpiScoreEl.textContent=calls.length?Math.round(calls.reduce((s,c)=>s+avgScore(c.scores),0)/calls.length):'—';
+  const cr=(den)=>den.length?Math.round(closed.filter(c=>den.includes(c)).length/den.length*100)+'%':'—';
+  const crSub=(den,label)=>den.length?`${closed.filter(c=>den.includes(c)).length} of ${den.length} ${label}`:'';
+  document.getElementById('kpi-cr-booked').textContent=cr(calls);
+  document.getElementById('kpi-cr-booked-sub').textContent=crSub(calls,'booked');
+  document.getElementById('kpi-cr-showed').textContent=cr(calledTaken);
+  document.getElementById('kpi-cr-showed-sub').textContent=crSub(calledTaken,'showed');
+  document.getElementById('kpi-cr-pitched-all').textContent=cr(calledPitched);
+  document.getElementById('kpi-cr-pitched-all-sub').textContent=crSub(calledPitched,'pitched');
+  document.getElementById('kpi-cr-pitched-excl').textContent=cr(calls.filter(c=>c.callType==='pitched'));
+  document.getElementById('kpi-cr-pitched-excl-sub').textContent=crSub(calls.filter(c=>c.callType==='pitched'),'pitched');
 
   // Installment schedule
   const schedKeys=Object.keys(scheduleMap).sort();
