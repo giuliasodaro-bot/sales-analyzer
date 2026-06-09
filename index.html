@@ -333,11 +333,29 @@ const STORAGE_KEY = 'sales_calls';
 // Migrate from old versioned keys
 (function(){
   try{
-    if(JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]').length) return;
-    for(var k of['sales_calls_v1','sales_calls_v2','sales_calls_v3']){
-      var d=JSON.parse(localStorage.getItem(k)||'[]');
-      if(d.length){localStorage.setItem(STORAGE_KEY,JSON.stringify(d));break;}
+    // Migrate from old versioned keys
+    var current=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
+    if(!current.length){
+      for(var k of['sales_calls_v1','sales_calls_v2','sales_calls_v3']){
+        var d=JSON.parse(localStorage.getItem(k)||'[]');
+        if(d.length){localStorage.setItem(STORAGE_KEY,JSON.stringify(d));current=d;break;}
+      }
     }
+    // Migrate old score keys to new ones
+    var scoreMap={discovery_spin:'discovery_depth',discovery_nepq:'discovery_depth',closing:'closing_strength',eq:'eq_in_closing',ifs_awareness:null};
+    var changed=false;
+    current.forEach(function(c){
+      if(!c.scores) return;
+      Object.keys(scoreMap).forEach(function(oldKey){
+        if(c.scores[oldKey]!==undefined){
+          var newKey=scoreMap[oldKey];
+          if(newKey&&!c.scores[newKey]) c.scores[newKey]=c.scores[oldKey];
+          delete c.scores[oldKey];
+          changed=true;
+        }
+      });
+    });
+    if(changed) localStorage.setItem(STORAGE_KEY,JSON.stringify(current));
   }catch(e){}
 })();
 
