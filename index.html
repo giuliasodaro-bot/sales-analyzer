@@ -693,6 +693,7 @@ function getFiltered(){
 }
 
 function renderDashboard(){
+  if(!document.getElementById('kpi-calls')) return;
   const calls=getFiltered();
   const pitched=calls.filter(c=>c.callType==='pitched');
   const closed=calls.filter(c=>(c.outcome||'').toLowerCase()==='closed');
@@ -790,7 +791,7 @@ function renderDashboard(){
   // Installment schedule
   const schedKeys=Object.keys(scheduleMap).sort();
   const instEl=document.getElementById('installment-section');
-  if(schedKeys.length){
+  if(instEl&&schedKeys.length){
     instEl.style.display='block';
     document.getElementById('installment-list').innerHTML=schedKeys.map(m=>{
       const a=scheduleMap[m].active, p=scheduleMap[m].passive, total=a+p;
@@ -807,7 +808,7 @@ function renderDashboard(){
       </div>`;
     }).join('');
   } else {
-    instEl.style.display='none';
+    if(instEl) instEl.style.display='none';
   }
 
   // Loss analysis — avg scores on lost calls vs won
