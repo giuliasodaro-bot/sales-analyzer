@@ -330,10 +330,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="kpi"><div class="kpi-label">Close rate (pitched excl. FDQ)</div><div class="kpi-val" id="kpi-cr-pitched-excl">—</div><div class="kpi-sub" id="kpi-cr-pitched-excl-sub"></div></div>
   </div>
 
-  <!-- Loss analysis -->
-  <div class="loss-section" id="loss-section" style="display:none">
-    <div class="loss-title">Where you're losing calls</div>
-    <div id="loss-chart"></div>
+  <!-- Synthesized feedback -->
+  <div class="card" id="synth-section" style="display:none;margin-bottom:1rem">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div class="card-title" style="margin:0">Coaching synthesis</div>
+      <button class="btn-fetch" id="btn-synth" onclick="synthesizeFeedback()">Generate insights</button>
+    </div>
+    <div id="synth-content" style="font-size:13px;color:var(--muted)">Click "Generate insights" to synthesize coaching feedback across filtered calls.</div>
   </div>
 
   <!-- Aggregate scores -->
@@ -490,7 +493,7 @@ function loadCalls(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[
 function saveCalls(c){localStorage.setItem(STORAGE_KEY,JSON.stringify(c));}
 function cls(v){return v>=75?'hi':v>=50?'md':'lo';}
 function setStatus(id,msg,type){const el=document.getElementById(id);el.textContent=msg;el.className='status'+(type?' '+type:'');}
-function avgScore(s){return Math.round(Object.values(s).reduce((a,b)=>a+b,0)/9);}
+function avgScore(s){const vals=Object.values(s).filter(v=>typeof v==='number');return vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):0;}
 function fmtMoney(n){return n?'$'+Math.round(n).toLocaleString():'—';}
 function monthKey(d){return d.toISOString().substring(0,7);}
 function nowMonthKey(){return monthKey(new Date());}
@@ -527,23 +530,29 @@ Also extract from the transcript:
   "installments": 0,
   "scores": {
     "call_control": <0-100>,
-    "discovery_spin": <0-100>,
-    "discovery_nepq": <0-100>,
+    "discovery_depth": <0-100>,
     "belief_shifting": <0-100>,
     "objection_handling": <0-100>,
     "pitch_effectiveness": <0-100>,
-    "closing": <0-100>,
-    "eq": <0-100>,
-    "ifs_awareness": <0-100>
+    "closing_strength": <0-100>,
+    "eq_in_closing": <0-100>
   },
   "phases": {"opener":<min>,"discovery":<min>,"pitch":<min>,"objection_handling":<min>,"close":<min>},
-  "feedback": "<3-5 sentence coaching feedback>",
+  "strengths": ["<specific strength 1>","<specific strength 2>","<specific strength 3>"],
+  "improvements": ["<specific improvement 1>","<specific improvement 2>","<specific improvement 3>"],
   "outcome": "<closed|no_close|follow_up|unknown>"
 }
 
-${isFDQ?'This is an FDQ call — no pitch was made. Score pitch/closing/objection_handling based on discovery quality. Outcome should be follow_up unless clearly stated otherwise.':''}
+${isFDQ?'This is a Not Pitched or No Show call — adjust scoring accordingly. Outcome should be follow_up unless clearly stated otherwise.':''}
 
-Rubrics: call_control=frame/agenda/authority; discovery_spin=SPIN questions; discovery_nepq=neuro-emotional questions connecting pain to identity/future; belief_shifting=challenging limiting beliefs; objection_handling=root-level neutralisation; pitch_effectiveness=relevant benefit-led pitch; closing=assumptive decisive ask; eq=attunement/pacing/mirroring; ifs_awareness=recognising protective parts.`;
+Scoring rubrics (0-100 each):
+- call_control: Did the closer lead the frame, set agenda, maintain authority throughout? (0=no control, 100=perfect frame control)
+- discovery_depth: Quality and depth of discovery — SPIN + NEPQ combined: situation/problem/implication questions AND neuro-emotional questions connecting pain to identity/future (0=surface only, 100=deep pain uncovered)
+- belief_shifting: Did the closer challenge limiting beliefs and reframe the prospect's story? (0=none, 100=powerful reframes)
+- objection_handling: Were objections neutralised at root level vs pressure tactics? (0=caved or ignored, 100=elegant root-level resolution)
+- pitch_effectiveness: Relevant, benefit-led, connected to pain uncovered in discovery? (0=generic, 100=perfectly tailored)
+- closing_strength: Assumptive, smooth, decisive — clear ask for the decision, no hesitation? (0=no ask, 100=strong assumptive close)
+- eq_in_closing: Emotional attunement throughout, especially in close — pacing, mirroring, detecting and responding to shifts? (0=robotic, 100=deeply attuned)`;
 
   try{
     const resp=await fetch('https://api.anthropic.com/v1/messages',{
@@ -580,6 +589,7 @@ Rubrics: call_control=frame/agenda/authority; discovery_spin=SPIN questions; dis
       installments,
       refund:effectiveRefund,
       fathom:fathomData||null,
+      transcript:document.getElementById('transcript').value.trim(),
       timestamp:(()=>{
         const cd=document.getElementById('call-date').value;
         const fd=fathomData?.date;
@@ -599,7 +609,7 @@ Rubrics: call_control=frame/agenda/authority; discovery_spin=SPIN questions; dis
 
 function renderResults(r){
   const s=r.scores;
-  const labels={call_control:'Call control',discovery_spin:'Discovery SPIN',discovery_nepq:'Discovery NEPQ',belief_shifting:'Belief shifting',objection_handling:'Objection handling',pitch_effectiveness:'Pitch effectiveness',closing:'Closing',eq:'EQ',ifs_awareness:'IFS awareness'};
+  const labels={call_control:'Call control',discovery_depth:'Discovery depth',belief_shifting:'Belief shifting',objection_handling:'Objection handling',pitch_effectiveness:'Pitch effectiveness',closing_strength:'Closing strength',eq_in_closing:'EQ in closing'};
   const a=avgScore(s);
   const instCommAmt=r.cashCollected?Math.round(r.cashCollected*r.comm/100):0;
   const remaining=r.generatedRevenue&&r.installments>1?r.generatedRevenue-r.cashCollected:0;
@@ -619,11 +629,25 @@ function renderResults(r){
 
   const p=r.phases||{};
   const pl={opener:'Opener',discovery:'Discovery',pitch:'Pitch',objection_handling:'Objections',close:'Close'};
+  const totalMin=Object.values(p).reduce((a,b)=>a+(b||0),0);
   document.getElementById('phase-grid').innerHTML=Object.entries(pl).map(([k,label])=>
     `<div class="phase-card"><div class="phase-lbl">${label}</div><div class="phase-val">${p[k]||0}</div><div class="phase-unit">min</div></div>`
-  ).join('');
+  ).join('')+`<div class="phase-card" style="border:1px solid var(--border-md)"><div class="phase-lbl">Total</div><div class="phase-val">${totalMin}</div><div class="phase-unit">min</div></div>`;
 
-  document.getElementById('feedback').textContent=r.feedback||'';
+  // Strengths & improvements
+  const strengths=r.strengths||[];
+  const improvements=r.improvements||[];
+  document.getElementById('feedback').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div>
+        <div style="font-size:12px;font-weight:600;color:var(--success);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px">✓ Strengths</div>
+        ${strengths.map(s=>`<div style="font-size:13px;margin-bottom:6px;padding-left:8px;border-left:2px solid var(--success)">${s}</div>`).join('')}
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:600;color:var(--danger);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px">↑ Improve</div>
+        ${improvements.map(s=>`<div style="font-size:13px;margin-bottom:6px;padding-left:8px;border-left:2px solid var(--danger)">${s}</div>`).join('')}
+      </div>
+    </div>`;
   document.getElementById('results').style.display='block';
 }
 
@@ -674,29 +698,37 @@ function renderDashboard(){
   const closed=calls.filter(c=>(c.outcome||'').toLowerCase()==='closed');
   const now=nowMonthKey();
 
-  // Revenue KPIs
-  let activeRev=0, passiveRev=0, totalGenerated=0, activeComm=0, passiveComm=0;
-  const scheduleMap={}; // month -> {active, passive, commission}
+  // Revenue KPIs — use filter date range if set, else current month
+  const filterFrom=document.getElementById('f-date-from').value;
+  const filterTo=document.getElementById('f-date-to').value;
+  const rangeStart=filterFrom?filterFrom.substring(0,7):now;
+  const rangeEnd=filterTo?filterTo.substring(0,7):now;
 
-  closed.forEach(c=>{
-    totalGenerated+=c.generatedRevenue||0;
+  let activeRev=0, passiveRev=0, totalGenerated=0, activeComm=0;
+  const scheduleMap={};
+
+  // Use ALL closed calls (not just filtered) for schedule, but filter display
+  loadCalls().filter(c=>(c.outcome||'').toLowerCase()==='closed').forEach(c=>{
+    totalGenerated+=(document.getElementById('f-account').value===''||c.account===document.getElementById('f-account').value)?c.generatedRevenue||0:0;
     const rows=projectInstallments(c);
     rows.forEach(r=>{
       if(!scheduleMap[r.month]) scheduleMap[r.month]={active:0,passive:0,commission:0};
       const callMonth=monthKey(new Date(c.timestamp));
-      if(r.month===callMonth){
-        scheduleMap[r.month].active+=r.amount;
-        scheduleMap[r.month].commission+=r.commission;
-      } else {
-        scheduleMap[r.month].passive+=r.amount;
-        scheduleMap[r.month].commission+=r.commission;
-      }
+      if(r.month===callMonth){ scheduleMap[r.month].active+=r.amount; scheduleMap[r.month].commission+=r.commission; }
+      else { scheduleMap[r.month].passive+=r.amount; scheduleMap[r.month].commission+=r.commission; }
     });
   });
 
-  activeRev=(scheduleMap[now]?.active||0);
-  passiveRev=(scheduleMap[now]?.passive||0);
-  activeComm=scheduleMap[now]?.commission||0;
+  // Sum across selected range
+  Object.keys(scheduleMap).forEach(m=>{
+    if(m>=rangeStart&&m<=rangeEnd){
+      activeRev+=scheduleMap[m].active;
+      passiveRev+=scheduleMap[m].passive;
+      activeComm+=scheduleMap[m].commission;
+    }
+  });
+  // totalGenerated already filtered above
+  totalGenerated=closed.reduce((s,c)=>s+(c.generatedRevenue||0),0);
 
   // Year to date cash collected
   const nowYear=new Date().getFullYear().toString();
@@ -783,7 +815,7 @@ function renderDashboard(){
   const lossEl=document.getElementById('loss-section');
   if(lostCalls.length>=1){
     lossEl.style.display='block';
-    const scoreKeys=['call_control','discovery_spin','discovery_nepq','belief_shifting','objection_handling','pitch_effectiveness','closing','eq','ifs_awareness'];
+    const scoreKeys=['call_control','discovery_depth','belief_shifting','objection_handling','pitch_effectiveness','closing_strength','eq_in_closing'];
     const scoreLabels={call_control:'Call control',discovery_spin:'Discovery SPIN',discovery_nepq:'Discovery NEPQ',belief_shifting:'Belief shifting',objection_handling:'Obj. handling',pitch_effectiveness:'Pitch effectiveness',closing:'Closing',eq:'EQ',ifs_awareness:'IFS awareness'};
     // Average scores on lost calls
     const lossAvgs=scoreKeys.map(k=>({
@@ -806,18 +838,20 @@ function renderDashboard(){
   const aggEl=document.getElementById('agg-section');
   if(calls.length){
     aggEl.style.display='block';
-    const scoreKeys=['call_control','discovery_spin','discovery_nepq','belief_shifting','objection_handling','pitch_effectiveness','closing','eq','ifs_awareness'];
-    const scoreLabels={call_control:'Call control',discovery_spin:'Discovery SPIN',discovery_nepq:'Discovery NEPQ',belief_shifting:'Belief shifting',objection_handling:'Objection handling',pitch_effectiveness:'Pitch effectiveness',closing:'Closing',eq:'EQ',ifs_awareness:'IFS awareness'};
+    const scoreKeys=['call_control','discovery_depth','belief_shifting','objection_handling','pitch_effectiveness','closing_strength','eq_in_closing'];
+    const scoreLabels={call_control:'Call control',discovery_depth:'Discovery depth',belief_shifting:'Belief shifting',objection_handling:'Objection handling',pitch_effectiveness:'Pitch effectiveness',closing_strength:'Closing strength',eq_in_closing:'EQ in closing'};
     const phaseKeys=['opener','discovery','pitch','objection_handling','close'];
     const phaseLabels={opener:'Opener',discovery:'Discovery',pitch:'Pitch',objection_handling:'Objections',close:'Close'};
     document.getElementById('agg-scores').innerHTML=scoreKeys.map(k=>{
       const v=Math.round(calls.reduce((s,c)=>s+(c.scores[k]||0),0)/calls.length),c=cls(v);
       return `<div class="score-card"><div class="score-lbl">${scoreLabels[k]}</div><div class="score-num ${c}">${v}%</div><div class="bar"><div class="bar-inner ${c}" style="width:${v}%"></div></div></div>`;
     }).join('');
-    document.getElementById('agg-phases').innerHTML=phaseKeys.map(k=>{
-      const v=Math.round(calls.reduce((s,c)=>s+((c.phases&&c.phases[k])||0),0)/calls.length);
-      return `<div class="phase-card"><div class="phase-lbl">${phaseLabels[k]}</div><div class="phase-val">${v}</div><div class="phase-unit">min avg</div></div>`;
-    }).join('');
+    const phaseAvgs={};
+    phaseKeys.forEach(k=>{ phaseAvgs[k]=Math.round(calls.reduce((s,c)=>s+((c.phases&&c.phases[k])||0),0)/calls.length); });
+    const totalAvg=Object.values(phaseAvgs).reduce((a,b)=>a+b,0);
+    document.getElementById('agg-phases').innerHTML=phaseKeys.map(k=>
+      `<div class="phase-card"><div class="phase-lbl">${phaseLabels[k]}</div><div class="phase-val">${phaseAvgs[k]}</div><div class="phase-unit">min avg</div></div>`
+    ).join('')+`<div class="phase-card" style="border:1px solid var(--border-md)"><div class="phase-lbl">Total</div><div class="phase-val">${totalAvg}</div><div class="phase-unit">min avg</div></div>`;
   } else {
     aggEl.style.display='none';
   }
@@ -882,7 +916,7 @@ function openModal(id){
     <div class="stat"><div class="stat-label">Installments</div><div class="stat-val">${c.installments||'—'}</div></div>
     <div class="stat"><div class="stat-label">Commission</div><div class="stat-val" style="color:var(--success)">${fmtMoney(commAmt)}</div></div>`;
 
-  const labels={call_control:'Call control',discovery_spin:'Discovery SPIN',discovery_nepq:'Discovery NEPQ',belief_shifting:'Belief shifting',objection_handling:'Objection handling',pitch_effectiveness:'Pitch effectiveness',closing:'Closing',eq:'EQ',ifs_awareness:'IFS awareness'};
+  const labels={call_control:'Call control',discovery_depth:'Discovery depth',belief_shifting:'Belief shifting',objection_handling:'Objection handling',pitch_effectiveness:'Pitch effectiveness',closing_strength:'Closing strength',eq_in_closing:'EQ in closing'};
   document.getElementById('m-scores').innerHTML=Object.entries(labels).map(([k,label])=>{
     const v=s[k]||0,cl=cls(v);
     return `<div class="score-card"><div class="score-lbl">${label}</div><div class="score-num ${cl}">${v}%</div><div class="bar"><div class="bar-inner ${cl}" style="width:${v}%"></div></div></div>`;
@@ -894,7 +928,19 @@ function openModal(id){
     `<div class="phase-card"><div class="phase-lbl">${label}</div><div class="phase-val">${p[k]||0}</div><div class="phase-unit">min</div></div>`
   ).join('');
 
-  document.getElementById('m-feedback').textContent=c.feedback||'';
+  const mstrengths=c.strengths||[];
+  const mimprovements=c.improvements||[];
+  document.getElementById('m-feedback').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div>
+        <div style="font-size:12px;font-weight:600;color:var(--success);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px">✓ Strengths</div>
+        ${mstrengths.map(s=>`<div style="font-size:13px;margin-bottom:6px;padding-left:8px;border-left:2px solid var(--success)">${s}</div>`).join('')||'<div style="font-size:13px;color:var(--muted)">None stored</div>'}
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:600;color:var(--danger);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px">↑ Improve</div>
+        ${mimprovements.map(s=>`<div style="font-size:13px;margin-bottom:6px;padding-left:8px;border-left:2px solid var(--danger)">${s}</div>`).join('')||'<div style="font-size:13px;color:var(--muted)">None stored</div>'}
+      </div>
+    </div>`;
   // Pre-fill update fields
   const outcomeEl=document.getElementById('m-outcome');
   const outcomeVal=(c.outcome||'unknown').toLowerCase();
@@ -965,11 +1011,11 @@ function exportData(){
   a.download='sales-calls-'+new Date().toISOString().substring(0,10)+'.json';
   a.click();
 }
-function importData(e){
+async function importData(e){
   const file=e.target.files[0];
   if(!file) return;
   const reader=new FileReader();
-  reader.onload=function(ev){
+  reader.onload=async function(ev){
     try{
       const imported=JSON.parse(ev.target.result);
       if(!Array.isArray(imported)) throw new Error('Invalid format');
@@ -979,12 +1025,119 @@ function importData(e){
       merged.sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
       saveCalls(merged);
       renderDashboard();
-      alert('Imported '+imported.length+' calls ('+merged.length+' total)');
+
+      // Backfill strengths/improvements on calls that don't have them
+      const needsBackfill=merged.filter(c=>!c.strengths||!c.strengths.length);
+      if(!needsBackfill.length){
+        alert('Imported '+imported.length+' calls ('+merged.length+' total). All up to date.');
+        return;
+      }
+      const apiKey=document.getElementById('api-key').value.trim();
+      if(!apiKey){
+        alert('Imported '+imported.length+' calls. '+needsBackfill.length+' calls need backfill — enter your API key in the Analyze tab and re-import to auto-fill strengths/improvements.');
+        return;
+      }
+      const confirmed=confirm('Imported '+imported.length+' calls. '+needsBackfill.length+' calls are missing strengths/improvements. Backfill now? (uses API)');
+      if(!confirmed) return;
+
+      // Show progress
+      const progressDiv=document.createElement('div');
+      progressDiv.style.cssText='position:fixed;bottom:20px;right:20px;background:var(--accent);color:#fff;padding:12px 18px;border-radius:var(--radius-lg);font-size:13px;z-index:999';
+      progressDiv.textContent='Backfilling 0/'+needsBackfill.length+'...';
+      document.body.appendChild(progressDiv);
+
+      let done=0;
+      for(const c of needsBackfill){
+        try{
+          const source=c.transcript?
+            `Transcript:
+${c.transcript.substring(0,3000)}`:
+            `Feedback summary:
+${c.feedback||''}
+Scores: ${JSON.stringify(c.scores||{})}`;
+          const resp=await fetch('https://api.anthropic.com/v1/messages',{
+            method:'POST',
+            headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+            body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:400,
+              system:'You are a sales coach. Given a call transcript or feedback summary, return ONLY valid JSON with exactly 3 strengths and 3 improvements: {"strengths":["...","...","..."],"improvements":["...","...","..."]}. Be specific and actionable.',
+              messages:[{role:'user',content:source}]
+            })
+          });
+          const data=await resp.json();
+          if(!data.error){
+            const text=data.content.map(b=>b.text||'').join('');
+            const match=text.replace(/```json|```/g,'').trim().match(/\{[\s\S]*\}/);
+            if(match){
+              const parsed=JSON.parse(match[0]);
+              c.strengths=parsed.strengths||[];
+              c.improvements=parsed.improvements||[];
+            }
+          }
+        }catch(err){console.warn('Backfill failed for call',c.id,err);}
+        done++;
+        progressDiv.textContent='Backfilling '+done+'/'+needsBackfill.length+'...';
+        saveCalls(merged);
+      }
+      document.body.removeChild(progressDiv);
+      renderDashboard();
+      alert('Done! Backfilled '+done+' calls.');
     }catch(err){alert('Import failed: '+err.message);}
   };
   reader.readAsText(file);
   e.target.value='';
 }
+async function synthesizeFeedback(){
+  const apiKey=document.getElementById('api-key').value.trim();
+  if(!apiKey){alert('Enter your Anthropic API key in the Analyze tab first.');return;}
+  const calls=getFiltered();
+  if(!calls.length) return;
+  const btn=document.getElementById('btn-synth');
+  btn.disabled=true; btn.innerHTML='<span class="spinner spinner-sm"></span>';
+  document.getElementById('synth-content').innerHTML='<span style="color:var(--muted)">Analyzing...</span>';
+
+  // Compile all stored strengths/improvements + feedback
+  const allStrengths=calls.flatMap(c=>c.strengths||[]);
+  const allImprovements=calls.flatMap(c=>c.improvements||[]);
+  const summary=`${calls.length} calls analyzed.
+
+Stored strengths:
+${allStrengths.join('\n')}
+
+Stored improvements:
+${allImprovements.join('\n')}`;
+
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:600,
+        system:'You are an expert sales coach. Given a summary of strengths and areas for improvement across multiple sales calls, synthesize the top 3 recurring strengths and top 3 most important improvements. Return ONLY valid JSON: {"strengths":["...","...","..."],"improvements":["...","...","..."]}',
+        messages:[{role:'user',content:summary}]
+      })
+    });
+    const data=await resp.json();
+    if(data.error) throw new Error(data.error.message);
+    const text=data.content.map(b=>b.text||'').join('');
+    const parsed=JSON.parse(text.replace(/```json|```/g,'').trim().match(/\{[\s\S]*\}/)[0]);
+    const s=parsed.strengths||[], im=parsed.improvements||[];
+    document.getElementById('synth-content').innerHTML=`
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--success);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px">✓ Top strengths</div>
+          ${s.map(x=>`<div style="font-size:13px;margin-bottom:8px;padding-left:8px;border-left:2px solid var(--success)">${x}</div>`).join('')}
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--danger);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px">↑ Top improvements</div>
+          ${im.map(x=>`<div style="font-size:13px;margin-bottom:8px;padding-left:8px;border-left:2px solid var(--danger)">${x}</div>`).join('')}
+        </div>
+      </div>`;
+  }catch(e){
+    document.getElementById('synth-content').innerHTML=`<span style="color:var(--danger)">Error: ${e.message}</span>`;
+  }finally{
+    btn.disabled=false; btn.innerHTML='Generate insights';
+  }
+}
+
 function clearAll(){
   if(confirm('Delete all saved calls?')){localStorage.removeItem(STORAGE_KEY);renderDashboard();}
 }
