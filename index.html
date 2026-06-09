@@ -211,8 +211,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <div class="dash-header">
     <h2>Dashboard</h2>
     <div style="display:flex;gap:6px">
-      <button class="btn-sm" onclick="debugFix()">Fix scores</button>
-      <button class="btn-sm" onclick="debugScores()">Show scores</button>
       <button class="btn-sm" onclick="exportData()">↓ Export</button>
       <label class="btn-sm" style="cursor:pointer;margin:0">↑ Import<input type="file" accept=".json" id="import-input" onchange="importData(event)" style="display:none"/></label>
       <button class="btn-sm btn-danger" onclick="clearAll()">Clear all</button>
@@ -359,6 +357,17 @@ const STORAGE_KEY = 'sales_calls';
       });
     });
     if(changed) localStorage.setItem(STORAGE_KEY,JSON.stringify(calls));
+    // Migrate 0-100 scores to 0-10
+    var calls2=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
+    var changed2=false;
+    calls2.forEach(function(c){
+      if(!c.scores) return;
+      Object.values(c.scores).forEach(function(v,i){
+        var k=Object.keys(c.scores)[i];
+        if(c.scores[k]>10){c.scores[k]=Math.round(c.scores[k]/10);changed2=true;}
+      });
+    });
+    if(changed2) localStorage.setItem(STORAGE_KEY,JSON.stringify(calls2));
   }catch(e){}
 })();
 
@@ -424,7 +433,7 @@ function loadCalls(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[
 function saveCalls(c){localStorage.setItem(STORAGE_KEY,JSON.stringify(c));}
 
 // HELPERS
-function cls(v){return v>=75?'hi':v>=50?'md':'lo';}
+function cls(v){return v>=7.5?'hi':v>=5?'md':'lo';}
 function setStatus(id,msg,type){var el=document.getElementById(id);if(!el)return;el.textContent=msg;el.className='status'+(type?' '+type:'');}
 function avgScore(s){if(!s)return 0;var vals=Object.values(s).filter(function(v){return typeof v==='number';});return vals.length?Math.round(vals.reduce(function(a,b){return a+b;},0)/vals.length):0;}
 function fmtMoney(n){return n?'$'+Math.round(n).toLocaleString():'—';}
@@ -443,7 +452,7 @@ async function runAnalysis(){
   document.getElementById('results').style.display='none';
   var refundAmt=parseFloat(document.getElementById('refund').value)||0;
   var isNoPitch=callType==='not_pitched'||callType==='no_show';
-  var system='You are an expert sales coach. Return ONLY valid JSON, no markdown.\n\nExtract from transcript:\n- closer_name: salesperson name (empty if unclear)\n- client_name: prospect name (empty if unclear)\n- generated_revenue: total contract value USD (0 if not closed)\n- cash_collected: amount paid today USD (0 if not mentioned)\n- installments: number of monthly installments (1 if single, 0 if not closed)\n\n{\n  "closer_name":"","client_name":"","generated_revenue":0,"cash_collected":0,"installments":0,\n  "scores":{"call_control":<0-100>,"discovery_depth":<0-100>,"belief_shifting":<0-100>,"objection_handling":<0-100>,"pitch_effectiveness":<0-100>,"closing_strength":<0-100>,"eq_in_closing":<0-100>},\n  "phases":{"opener":<min>,"discovery":<min>,"pitch":<min>,"objection_handling":<min>,"close":<min>},\n  "strengths":["<strength1>","<strength2>","<strength3>"],\n  "improvements":["<improvement1>","<improvement2>","<improvement3>"],\n  "outcome":"<closed|no_close|follow_up|unknown>"\n}\n\n'+(isNoPitch?'No pitch was made. Score accordingly. Outcome = follow_up unless stated otherwise.\n\n':'')+'Scores: call_control=frame/agenda/authority; discovery_depth=SPIN+NEPQ quality; belief_shifting=challenging limiting beliefs; objection_handling=root-level neutralisation; pitch_effectiveness=tailored benefit-led pitch; closing_strength=assumptive decisive ask; eq_in_closing=emotional attunement throughout.';
+  var system='You are an expert sales coach. Return ONLY valid JSON, no markdown.\n\nExtract from transcript:\n- closer_name: salesperson name (empty if unclear)\n- client_name: prospect name (empty if unclear)\n- generated_revenue: total contract value USD (0 if not closed)\n- cash_collected: amount paid today USD (0 if not mentioned)\n- installments: number of monthly installments (1 if single, 0 if not closed)\n\n{\n  "closer_name":"","client_name":"","generated_revenue":0,"cash_collected":0,"installments":0,\n  "scores":{"call_control":<0-10>,"discovery_depth":<0-10>,"belief_shifting":<0-10>,"objection_handling":<0-10>,"pitch_effectiveness":<0-10>,"closing_strength":<0-10>,"eq_in_closing":<0-10>},\n  "phases":{"opener":<min>,"discovery":<min>,"pitch":<min>,"objection_handling":<min>,"close":<min>},\n  "strengths":["<strength1>","<strength2>","<strength3>"],\n  "improvements":["<improvement1>","<improvement2>","<improvement3>"],\n  "outcome":"<closed|no_close|follow_up|unknown>"\n}\n\n'+(isNoPitch?'No pitch was made. Score accordingly. Outcome = follow_up unless stated otherwise.\n\n':'')+'Scores: call_control=frame/agenda/authority; discovery_depth=SPIN+NEPQ quality; belief_shifting=challenging limiting beliefs; objection_handling=root-level neutralisation; pitch_effectiveness=tailored benefit-led pitch; closing_strength=assumptive decisive ask; eq_in_closing=emotional attunement throughout.';
   try{
     var resp=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
@@ -495,7 +504,7 @@ function renderScoreGrid(elId,scores){
   var el=document.getElementById(elId); if(!el) return;
   el.innerHTML=SCORE_KEYS.map(function(k){
     var v=scores[k]||0, c=cls(v);
-    return '<div class="score-card"><div class="score-lbl">'+SCORE_LABELS[k]+'</div><div class="score-num '+c+'">'+v+'%</div><div class="bar"><div class="bar-inner '+c+'" style="width:'+v+'%"></div></div></div>';
+    return '<div class="score-card"><div class="score-lbl">'+SCORE_LABELS[k]+'</div><div class="score-num '+c+'">'+v+'</div><div class="bar"><div class="bar-inner '+c+'" style="width:'+(v*10)+'%"></div></div></div>';
   }).join('');
 }
 
@@ -523,7 +532,7 @@ function renderResults(r){
   var remaining=r.generatedRevenue&&r.installments>1?r.generatedRevenue-r.cashCollected:0;
   var instCommAmt=r.cashCollected?Math.round(r.cashCollected*r.comm/100):0;
   document.getElementById('r-overall-grid').innerHTML=
-    '<div class="stat"><div class="stat-label">Score</div><div class="stat-val" style="color:var(--accent)">'+a+'</div><div style="font-size:11px;color:var(--muted)">out of 100</div></div>'
+    '<div class="stat"><div class="stat-label">Score</div><div class="stat-val" style="color:var(--accent)">'+a+'</div><div style="font-size:11px;color:var(--muted)">out of 10 avg</div></div>'
     +'<div class="stat"><div class="stat-label">Cash collected</div><div class="stat-val" style="color:var(--success)">'+fmtMoney(r.cashCollected)+'</div></div>'
     +'<div class="stat"><div class="stat-label">Revenue generated</div><div class="stat-val">'+fmtMoney(r.generatedRevenue)+'</div></div>'
     +'<div class="stat"><div class="stat-label">Remaining</div><div class="stat-val" style="color:var(--purple)">'+fmtMoney(remaining)+'</div></div>'
@@ -752,7 +761,7 @@ function openModal(id){
   var a=avgScore(c.scores);
   var remaining=c.generatedRevenue&&c.installments>1?c.generatedRevenue-c.cashCollected:0;
   document.getElementById('m-overall').innerHTML=
-    '<div class="stat"><div class="stat-label">Score</div><div class="stat-val" style="color:var(--accent)">'+a+'</div></div>'
+    '<div class="stat"><div class="stat-label">Score</div><div class="stat-val" style="color:var(--accent)">'+a+'</div><div style="font-size:11px;color:var(--muted)">out of 10 avg</div></div>'
     +'<div class="stat"><div class="stat-label">Cash collected</div><div class="stat-val" style="color:var(--success)">'+fmtMoney(c.cashCollected)+'</div></div>'
     +'<div class="stat"><div class="stat-label">Revenue generated</div><div class="stat-val">'+fmtMoney(c.generatedRevenue)+'</div></div>'
     +'<div class="stat"><div class="stat-label">Remaining</div><div class="stat-val" style="color:var(--purple)">'+fmtMoney(remaining)+'</div></div>'
@@ -851,34 +860,6 @@ async function synthesizeFeedback(){
 }
 
 // EXPORT / IMPORT
-function debugScores(){
-  var calls=JSON.parse(localStorage.getItem('sales_calls')||'[]');
-  if(!calls.length){alert('No calls');return;}
-  var c=calls[0];
-  alert('First call scores:\n'+JSON.stringify(c.scores,null,2));
-}
-function debugFix(){
-  try{
-    var calls=JSON.parse(localStorage.getItem('sales_calls')||'[]');
-    var map={discovery_spin:'discovery_depth',discovery_nepq:'discovery_depth',closing:'closing_strength',eq:'eq_in_closing',ifs_awareness:null};
-    var report=[];
-    calls.forEach(function(c,i){
-      if(!c.scores){report.push('call '+i+': no scores');return;}
-      var keys=Object.keys(c.scores);
-      report.push('call '+i+' ('+c.client+'): '+keys.join(', '));
-      keys.forEach(function(ok){
-        if(map[ok]!==undefined){
-          var nk=map[ok];
-          if(nk&&!c.scores[nk]) c.scores[nk]=c.scores[ok];
-          delete c.scores[ok];
-        }
-      });
-    });
-    localStorage.setItem('sales_calls',JSON.stringify(calls));
-    alert('Score keys in your calls:\n'+report.slice(0,5).join('\n')+(report.length>5?'\n...('+report.length+' total)':''));
-    renderDashboard();
-  }catch(e){alert('Error: '+e.message);}
-}
 function exportData(){
   var calls=loadCalls();
   var blob=new Blob([JSON.stringify(calls,null,2)],{type:'application/json'});
