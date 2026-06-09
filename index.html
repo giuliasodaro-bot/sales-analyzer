@@ -1075,10 +1075,10 @@ Scores: ${JSON.stringify(c.scores||{})}`;
           }
         }catch(err){console.warn('Backfill failed for call',c.id,err);}
         done++;
-        progressDiv.textContent='Backfilling '+done+'/'+needsBackfill.length+'...';
+        if(progressDiv.parentNode) progressDiv.textContent='Backfilling '+done+'/'+needsBackfill.length+'...';
         saveCalls(merged);
       }
-      document.body.removeChild(progressDiv);
+      if(progressDiv.parentNode) progressDiv.parentNode.removeChild(progressDiv);
       renderDashboard();
       alert('Done! Backfilled '+done+' calls.');
     }catch(err){alert('Import failed: '+err.message);}
