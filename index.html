@@ -680,13 +680,14 @@ function projectInstallments(call){
 }
 
 // DASHBOARD
+function getVal(id){const el=document.getElementById(id);return el?el.value:'';}
 function getFiltered(){
   let calls=loadCalls();
-  const fa=document.getElementById('f-account').value;
-  const ft=document.getElementById('f-type').value;
-  const fc=document.getElementById('f-client').value.toLowerCase().trim();
-  const fd1=document.getElementById('f-date-from').value;
-  const fd2=document.getElementById('f-date-to').value;
+  const fa=getVal('f-account');
+  const ft=getVal('f-type');
+  const fc=getVal('f-client').toLowerCase().trim();
+  const fd1=getVal('f-date-from');
+  const fd2=getVal('f-date-to');
   if(fa) calls=calls.filter(c=>c.account===fa);
   if(ft) calls=calls.filter(c=>c.callType===ft);
   if(fc) calls=calls.filter(c=>(c.client||'').toLowerCase().includes(fc)||(c.fathom?.attendees||'').toLowerCase().includes(fc));
@@ -703,8 +704,8 @@ function renderDashboard(){
   const now=nowMonthKey();
 
   // Revenue KPIs — use filter date range if set, else current month
-  const filterFrom=document.getElementById('f-date-from').value;
-  const filterTo=document.getElementById('f-date-to').value;
+  const filterFrom=getVal('f-date-from');
+  const filterTo=getVal('f-date-to');
   const rangeStart=filterFrom?filterFrom.substring(0,7):now;
   const rangeEnd=filterTo?filterTo.substring(0,7):now;
 
@@ -713,7 +714,7 @@ function renderDashboard(){
 
   // Use ALL closed calls (not just filtered) for schedule, but filter display
   loadCalls().filter(c=>(c.outcome||'').toLowerCase()==='closed').forEach(c=>{
-    totalGenerated+=(document.getElementById('f-account').value===''||c.account===document.getElementById('f-account').value)?c.generatedRevenue||0:0;
+    totalGenerated+=(getVal('f-account')===''||c.account===getVal('f-account'))?c.generatedRevenue||0:0;
     const rows=projectInstallments(c);
     rows.forEach(r=>{
       if(!scheduleMap[r.month]) scheduleMap[r.month]={active:0,passive:0,commission:0};
@@ -756,8 +757,8 @@ function renderDashboard(){
   document.getElementById('kpi-fdq-count').textContent=calledFDQ.length;
 
   // Avg calls per day
-  const fd1=document.getElementById('f-date-from').value;
-  const fd2=document.getElementById('f-date-to').value;
+  const fd1=getVal('f-date-from');
+  const fd2=getVal('f-date-to');
   if(fd1&&fd2&&calls.length){
     const days=Math.max(1,Math.round((new Date(fd2)-new Date(fd1))/(1000*60*60*24))+1);
     const avgPerDay=(calledTaken.length/days).toFixed(1);
