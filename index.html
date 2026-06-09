@@ -435,7 +435,7 @@ function saveCalls(c){localStorage.setItem(STORAGE_KEY,JSON.stringify(c));}
 // HELPERS
 function cls(v){return v>=7.5?'hi':v>=5?'md':'lo';}
 function setStatus(id,msg,type){var el=document.getElementById(id);if(!el)return;el.textContent=msg;el.className='status'+(type?' '+type:'');}
-function avgScore(s){if(!s)return 0;var vals=Object.values(s).filter(function(v){return typeof v==='number';});return vals.length?Math.round(vals.reduce(function(a,b){return a+b;},0)*10)/10:0;}
+function avgScore(s){if(!s)return 0;return Math.round(SCORE_KEYS.reduce(function(a,k){return a+(s[k]||0);},0)*10)/10;}
 function fmtMoney(n){return n?'$'+Math.round(n).toLocaleString():'—';}
 function monthKey(d){return d.toISOString().substring(0,7);}
 function nowMonthKey(){return monthKey(new Date());}
@@ -452,7 +452,9 @@ async function runAnalysis(){
   document.getElementById('results').style.display='none';
   var refundAmt=parseFloat(document.getElementById('refund').value)||0;
   var isNoPitch=callType==='not_pitched'||callType==='no_show';
-  var system='You are an expert sales coach. Return ONLY valid JSON, no markdown.\n\nExtract from transcript:\n- closer_name: salesperson name (empty if unclear)\n- client_name: prospect name (empty if unclear)\n- generated_revenue: total contract value USD (0 if not closed)\n- cash_collected: amount paid today USD (0 if not mentioned)\n- installments: number of monthly installments (1 if single, 0 if not closed)\n\n{\n  "closer_name":"","client_name":"","generated_revenue":0,"cash_collected":0,"installments":0,\n  "scores":{"call_control":<0-10>,"discovery_depth":<0-10>,"belief_shifting":<0-10>,"objection_handling":<0-10>,"pitch_effectiveness":<0-10>,"closing_strength":<0-10>,"eq_in_closing":<0-10>},\n  "phases":{"opener":<min>,"discovery":<min>,"pitch":<min>,"objection_handling":<min>,"close":<min>},\n  "strengths":["<strength1>","<strength2>","<strength3>"],\n  "improvements":["<improvement1>","<improvement2>","<improvement3>"],\n  "outcome":"<closed|no_close|follow_up|unknown>"\n}\n\n'+(isNoPitch?'No pitch was made. Score accordingly. Outcome = follow_up unless stated otherwise.\n\n':'')+'Scores: call_control=frame/agenda/authority; discovery_depth=SPIN+NEPQ quality; belief_shifting=challenging limiting beliefs; objection_handling=root-level neutralisation; pitch_effectiveness=tailored benefit-led pitch; closing_strength=assumptive decisive ask; eq_in_closing=emotional attunement throughout.';
+  var system='You are an expert sales coach. Return ONLY valid JSON, no markdown.\n\nExtract from transcript:\n- closer_name: salesperson name (empty if unclear)\n- client_name: prospect name (empty if unclear)\n- generated_revenue: total contract value USD (0 if not closed)\n- cash_collected: amount paid today USD (0 if not mentioned)\n- installments: number of monthly installments (1 if single, 0 if not closed)\n\n{\n  "closer_name":"","client_name":"","generated_revenue":0,"cash_collected":0,"installments":0,\n  "scores":{"call_control":<0-10>,"discovery_depth":<0-10>,"belief_shifting":<0-10>,"objection_handling":<0-10>,"pitch_effectiveness":<0-10>,"closing_strength":<0-10>,"eq_in_closing":<0-10>}
+
+Scoring: 6 main categories (call_control through closing_strength) scored 0-10, total out of 60. EQ in closing scored separately 0-10.,\n  "phases":{"opener":<min>,"discovery":<min>,"pitch":<min>,"objection_handling":<min>,"close":<min>},\n  "strengths":["<strength1>","<strength2>","<strength3>"],\n  "improvements":["<improvement1>","<improvement2>","<improvement3>"],\n  "outcome":"<closed|no_close|follow_up|unknown>"\n}\n\n'+(isNoPitch?'No pitch was made. Score accordingly. Outcome = follow_up unless stated otherwise.\n\n':'')+'Scores: call_control=frame/agenda/authority; discovery_depth=SPIN+NEPQ quality; belief_shifting=challenging limiting beliefs; objection_handling=root-level neutralisation; pitch_effectiveness=tailored benefit-led pitch; closing_strength=assumptive decisive ask; eq_in_closing=emotional attunement throughout.';
   try{
     var resp=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
@@ -495,17 +497,22 @@ async function runAnalysis(){
   btn.disabled=false; btn.innerHTML='▶ Analyze transcript';
 }
 
-var SCORE_LABELS={call_control:'Call control',discovery_depth:'Discovery depth',belief_shifting:'Belief shifting',objection_handling:'Objection handling',pitch_effectiveness:'Pitch effectiveness',closing_strength:'Closing strength',eq_in_closing:'EQ in closing'};
-var SCORE_KEYS=['call_control','discovery_depth','belief_shifting','objection_handling','pitch_effectiveness','closing_strength','eq_in_closing'];
+var SCORE_LABELS={call_control:'Call control',discovery_depth:'Discovery depth',belief_shifting:'Belief shifting',objection_handling:'Objection handling',pitch_effectiveness:'Pitch effectiveness',closing_strength:'Closing strength'};
+var SCORE_KEYS=['call_control','discovery_depth','belief_shifting','objection_handling','pitch_effectiveness','closing_strength'];
+var EQ_KEY='eq_in_closing';
 var PHASE_KEYS=['opener','discovery','pitch','objection_handling','close'];
 var PHASE_LABELS={opener:'Opener',discovery:'Discovery',pitch:'Pitch',objection_handling:'Objections',close:'Close'};
 
 function renderScoreGrid(elId,scores){
   var el=document.getElementById(elId); if(!el) return;
-  el.innerHTML=SCORE_KEYS.map(function(k){
+  var html=SCORE_KEYS.map(function(k){
     var v=scores[k]||0, c=cls(v);
     return '<div class="score-card"><div class="score-lbl">'+SCORE_LABELS[k]+'</div><div class="score-num '+c+'">'+v+'</div><div class="bar"><div class="bar-inner '+c+'" style="width:'+(v*10)+'%"></div></div></div>';
   }).join('');
+  // EQ separately
+  var eq=scores[EQ_KEY]||0, eqc=cls(eq);
+  html+='<div class="score-card" style="border:1px solid var(--border-md)"><div class="score-lbl">EQ in closing</div><div class="score-num '+eqc+'">'+eq+' / 10</div><div class="bar"><div class="bar-inner '+eqc+'" style="width:'+(eq*10)+'%"></div></div></div>';
+  el.innerHTML=html;
 }
 
 function renderPhaseGrid(elId,phases,suffix){
@@ -683,6 +690,7 @@ function renderDashboard(){
     aggEl.style.display='block';
     var avgScores={};
     SCORE_KEYS.forEach(function(k){avgScores[k]=Math.round(calls.reduce(function(s,c){return s+((c.scores&&c.scores[k])||0);},0)/calls.length*10)/10;});
+    avgScores[EQ_KEY]=Math.round(calls.reduce(function(s,c){return s+((c.scores&&c.scores[EQ_KEY])||0);},0)/calls.length*10)/10;
     renderScoreGrid('agg-scores',avgScores);
     var avgPhases={};
     PHASE_KEYS.forEach(function(k){avgPhases[k]=Math.round(calls.reduce(function(s,c){return s+((c.phases&&c.phases[k])||0);},0)/calls.length);});
@@ -701,7 +709,7 @@ function renderDashboard(){
   list.innerHTML='<table class="calls-table"><thead><tr><th>Date</th><th>Account</th><th>Client</th><th>Closer</th><th>Type</th><th>Score</th><th>Cash</th><th>Revenue</th><th>Outcome</th><th></th></tr></thead><tbody>'
     +calls.map(function(c){
       var a=avgScore(c.scores);
-      var sc=a>=52?'var(--success)':a>=35?'var(--warn)':'var(--danger)';
+      var sc=a>=45?'var(--success)':a>=30?'var(--warn)':'var(--danger)';
       var dt=new Date(c.timestamp).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'2-digit'});
       var ot=(c.outcome||'unknown').toLowerCase();
       var ct=c.callType||'pitched';
