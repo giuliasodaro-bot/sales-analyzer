@@ -676,7 +676,7 @@ function renderDashboard(){
   var cached=loadSynth(synthKey);
   var sc=document.getElementById('synth-content');
   if(sc){
-    if(cached){
+    if(cached&&cached.strengths&&cached.strengths.length&&cached.strengths[0]!=='...'){
       renderFeedbackBox('synth-content',cached.strengths,cached.improvements);
       document.getElementById('btn-synth').textContent='Refresh insights';
     } else {
