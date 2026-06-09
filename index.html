@@ -749,13 +749,17 @@ function renderDashboard(){
   var typeCls={pitched:'badge-pitched',not_pitched:'badge-fdq',fdq:'badge-fdq',no_show:'badge-no'};
   var outLbl={closed:'Closed',no_close:'No close',follow_up:'Follow up',unknown:'Unknown'};
   var outCls={closed:'badge-closed',no_close:'badge-no',follow_up:'badge-follow',unknown:'badge-unknown'};
-  list.innerHTML='<table class="calls-table"><thead><tr><th>Date</th><th>Account</th><th>Client</th><th>Closer</th><th>Type</th><th>Score</th><th>Cash</th><th>Revenue</th><th>Outcome</th><th></th></tr></thead><tbody>'
-    +calls.map(function(c){
+  var totalCash=0,totalRev=0,totalComm2=0;
+  var rows=calls.map(function(c){
       var a=avgScore(c.scores);
       var sc=a>=45?'var(--success)':a>=30?'var(--warn)':'var(--danger)';
       var dt=new Date(c.timestamp).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'2-digit'});
       var ot=(c.outcome||'unknown').toLowerCase();
       var ct=c.callType||'pitched';
+      var comm2=Math.round((c.cashCollected||0)*(c.comm||0)/100);
+      totalCash+=c.cashCollected||0;
+      totalRev+=c.generatedRevenue||0;
+      totalComm2+=comm2;
       return '<tr onclick="openModal('+c.id+')">'
         +'<td style="color:var(--muted);white-space:nowrap">'+dt+'</td>'
         +'<td style="font-weight:500">'+c.account+'</td>'
@@ -765,10 +769,19 @@ function renderDashboard(){
         +'<td><span style="font-weight:600;color:'+sc+'">'+a+'/60</span></td>'
         +'<td>'+fmtMoney(c.cashCollected)+'</td>'
         +'<td>'+fmtMoney(c.generatedRevenue)+'</td>'
+        +'<td style="color:var(--success);font-weight:500">'+(comm2?'$'+comm2.toLocaleString():'—')+'</td>'
         +'<td><span class="badge '+(outCls[ot]||'badge-unknown')+'">'+(outLbl[ot]||ot)+'</span></td>'
         +'<td>'+(c.fathom&&c.fathom.url?'<a href="'+c.fathom.url+'" target="_blank" onclick="event.stopPropagation()" style="font-size:11px;color:var(--accent-mid)">▶</a>':'')+'</td>'
         +'</tr>';
-    }).join('')+'</tbody></table>';
+    }).join('');
+  var tfootRow='<tr style="border-top:2px solid var(--border-md);font-weight:700;background:var(--surface2)">'
+    +'<td colspan="6" style="padding:10px 12px;font-size:12px;letter-spacing:.05em">TOTALS</td>'
+    +'<td style="padding:10px 12px">$'+totalCash.toLocaleString()+'</td>'
+    +'<td style="padding:10px 12px">$'+totalRev.toLocaleString()+'</td>'
+    +'<td style="padding:10px 12px;color:var(--success)">$'+totalComm2.toLocaleString()+'</td>'
+    +'<td colspan="2"></td>'
+    +'</tr>';
+  list.innerHTML='<table class="calls-table"><thead><tr><th>Date</th><th>Account</th><th>Client</th><th>Closer</th><th>Type</th><th>Score</th><th>Cash</th><th>Revenue</th><th>Commission</th><th>Outcome</th><th></th></tr></thead><tbody>'+rows+'</tbody><tfoot>'+tfootRow+'</tfoot></table>';
 
   // Recurring payments table
   var recurringEl=document.getElementById('recurring-section');
