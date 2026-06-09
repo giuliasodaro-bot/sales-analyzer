@@ -651,13 +651,23 @@ function renderDashboard(){
       }
     });
   } else {
+    // Sum cashCollected directly from closed calls within date range (covers single payments)
+    allClosed.forEach(function(c){
+      if(fa&&c.account!==fa) return;
+      var cDate=(c.dateClosed||c.timestamp||'').substring(0,10);
+      var cMon=cDate.substring(0,7);
+      if(cMon>=rangeStart&&cMon<=rangeEnd){
+        cashPeriod+=c.cashCollected||0;
+        commPeriod+=Math.round((c.cashCollected||0)*(c.comm||0)/100);
+      }
+    });
+    // Add passive installments within range and prev months from recurring plans
     Object.keys(schedMap).forEach(function(m){
       if(m>=rangeStart&&m<=rangeEnd){
-        cashPeriod+=schedMap[m].active+schedMap[m].passive;
+        cashPeriod+=schedMap[m].passive;
         commPeriod+=schedMap[m].commission;
       } else if(m<rangeStart&&m<=todayMonth){
-        cashPassive+=schedMap[m].active+schedMap[m].passive;
-        commPeriod+=schedMap[m].commission;
+        cashPassive+=schedMap[m].passive;
       }
     });
   }
