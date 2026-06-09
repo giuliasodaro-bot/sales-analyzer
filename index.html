@@ -629,12 +629,22 @@ function renderDashboard(){
   });
 
   // Cash/commission for selected period
+  var noDateFilter=!fd1&&!fd2;
+  var todayMonth=now;
   var cashPeriod=0,cashPassive=0,commPeriod=0;
   Object.keys(schedMap).forEach(function(m){
-    if(m>=rangeStart&&m<=rangeEnd){
-      cashPeriod+=schedMap[m].active;
-      cashPassive+=schedMap[m].passive;
-      commPeriod+=schedMap[m].commission;
+    if(noDateFilter){
+      // No date selected: sum all installments up to today as cash collected, nothing in prev months
+      if(m<=todayMonth){
+        cashPeriod+=schedMap[m].active+schedMap[m].passive;
+        commPeriod+=schedMap[m].commission;
+      }
+    } else {
+      if(m>=rangeStart&&m<=rangeEnd){
+        cashPeriod+=schedMap[m].active;
+        cashPassive+=schedMap[m].passive;
+        commPeriod+=schedMap[m].commission;
+      }
     }
   });
 
