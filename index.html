@@ -827,6 +827,8 @@ function renderDashboard(){
   if(!calls.length){list.innerHTML='<div class="empty-state">No calls match your filters.</div>';return;}
   const badgeCls=o=>({'closed':'badge-closed','no_close':'badge-no','follow_up':'badge-follow'}[(o||'').toLowerCase()]||'badge-unknown');
   const badgeLbl=o=>({'closed':'Closed','no_close':'No close','follow_up':'Follow up','unknown':'Unknown'}[(o||'').toLowerCase()]||'Unknown');
+  const typeBadgeCls=t=>({'pitched':'badge-pitched','not_pitched':'badge-fdq','fdq':'badge-fdq','no_show':'badge-no'}[t]||'badge-fdq');
+  const typeBadgeLbl=t=>({'pitched':'Pitched','not_pitched':'Not Pitched','fdq':'FDQ','no_show':'No Show'}[t]||t);
   list.innerHTML=`<table class="calls-table">
     <thead><tr><th>Date</th><th>Account</th><th>Client</th><th>Closer</th><th>Type</th><th>Score</th><th>Cash collected</th><th>Revenue</th><th>Outcome</th><th></th></tr></thead>
     <tbody>${calls.map(c=>{
@@ -839,7 +841,7 @@ function renderDashboard(){
         <td style="font-weight:500">${c.account}</td>
         <td>${clientLabel}</td>
         <td>${c.closer}</td>
-        <td><span class="badge ${c.callType==='fdq'?'badge-fdq':'badge-pitched'}">${c.callType==='fdq'?'FDQ':'Pitched'}</span></td>
+        <td><span class="badge ${typeBadgeCls(c.callType)}">${typeBadgeLbl(c.callType)}</span></td>
         <td><span style="font-weight:600;color:${sc}">${a}</span></td>
         <td>${fmtMoney(c.cashCollected)}</td>
         <td>${fmtMoney(c.generatedRevenue)}</td>
@@ -861,7 +863,7 @@ function openModal(id){
   const date=new Date(c.timestamp).toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'});
   const clientLabel=c.client||c.fathom?.attendees||'Unknown';
   document.getElementById('m-title').textContent=clientLabel+' — '+c.account;
-  document.getElementById('m-meta').textContent=`${date} · ${c.closer} · ${c.callType==='fdq'?'FDQ':'Pitched call'}`;
+  document.getElementById('m-meta').textContent=`${date} · ${c.closer} · ${{pitched:'Pitched',not_pitched:'Not Pitched',fdq:'FDQ',no_show:'No Show'}[c.callType]||c.callType}`;
 
   const fathomEl=document.getElementById('m-fathom');
   if(c.fathom?.url){
