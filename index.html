@@ -756,7 +756,20 @@ function renderDashboard(){
       var dt=new Date(c.timestamp).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'2-digit'});
       var ot=(c.outcome||'unknown').toLowerCase();
       var ct=c.callType||'pitched';
-      var comm2=Math.round((c.cashCollected||0)*(c.comm||0)/100);
+      // Commission = commission on first payment (if in range) + passive installments in range
+      var comm2=0;
+      var cDate=(c.dateClosed||c.timestamp||'').substring(0,10);
+      var cMon=cDate.substring(0,7);
+      // First payment commission
+      if(noDateFilter||(cMon>=rangeStart&&cMon<=rangeEnd)){
+        comm2+=Math.round((c.cashCollected||0)*(c.comm||0)/100);
+      }
+      // Passive installments commission in range
+      projectInstallments(c).forEach(function(r){
+        if(r.first) return;
+        var inRange=noDateFilter?(r.month<=todayMonth):(r.month>=rangeStart&&r.month<=rangeEnd);
+        if(inRange) comm2+=r.commission;
+      });
       totalCash+=c.cashCollected||0;
       totalRev+=c.generatedRevenue||0;
       totalComm2+=comm2;
@@ -764,7 +777,6 @@ function renderDashboard(){
         +'<td style="color:var(--muted);white-space:nowrap">'+dt+'</td>'
         +'<td style="font-weight:500">'+c.account+'</td>'
         +'<td>'+(c.client||'—')+'</td>'
-        +'<td>'+c.closer+'</td>'
         +'<td><span class="badge '+(typeCls[ct]||'badge-fdq')+'">'+(typeLbl[ct]||ct)+'</span></td>'
         +'<td><span style="font-weight:600;color:'+sc+'">'+a+'/60</span></td>'
         +'<td>'+fmtMoney(c.cashCollected)+'</td>'
@@ -775,13 +787,13 @@ function renderDashboard(){
         +'</tr>';
     }).join('');
   var tfootRow='<tr style="border-top:2px solid var(--border-md);font-weight:700;background:var(--surface2)">'
-    +'<td colspan="6" style="padding:10px 12px;font-size:12px;letter-spacing:.05em">TOTALS</td>'
+    +'<td colspan="5" style="padding:10px 12px;font-size:12px;letter-spacing:.05em">TOTALS</td>'
     +'<td style="padding:10px 12px">$'+totalCash.toLocaleString()+'</td>'
     +'<td style="padding:10px 12px">$'+totalRev.toLocaleString()+'</td>'
     +'<td style="padding:10px 12px;color:var(--success)">$'+totalComm2.toLocaleString()+'</td>'
     +'<td colspan="2"></td>'
     +'</tr>';
-  list.innerHTML='<table class="calls-table"><thead><tr><th>Date</th><th>Account</th><th>Client</th><th>Closer</th><th>Type</th><th>Score</th><th>Cash</th><th>Revenue</th><th>Commission</th><th>Outcome</th><th></th></tr></thead><tbody>'+rows+'</tbody><tfoot>'+tfootRow+'</tfoot></table>';
+  list.innerHTML='<table class="calls-table"><thead><tr><th>Date</th><th>Account</th><th>Client</th><th>Type</th><th>Score</th><th>Cash</th><th>Revenue</th><th>Commission</th><th>Outcome</th><th></th></tr></thead><tbody>'+rows+'</tbody><tfoot>'+tfootRow+'</tfoot></table>';
 
   // Recurring payments table
   var recurringEl=document.getElementById('recurring-section');
