@@ -617,15 +617,17 @@ function renderDashboard(){
   allClosed.forEach(function(c){
     if(fa&&c.account!==fa) return;
     var cDate=(c.dateClosed||c.timestamp||'').substring(0,10);
-    if(fd1&&cDate&&cDate<fd1) return;
-    if(fd2&&cDate&&cDate>fd2) return;
-    totalGenerated+=c.generatedRevenue||0;
+    // Always build installment schedule regardless of date filter
     projectInstallments(c).forEach(function(r){
       if(!schedMap[r.month]) schedMap[r.month]={active:0,passive:0,commission:0};
       var callMon=monthKey(new Date(c.timestamp));
       if(r.month===callMon){schedMap[r.month].active+=r.amount;schedMap[r.month].commission+=r.commission;}
       else{schedMap[r.month].passive+=r.amount;schedMap[r.month].commission+=r.commission;}
     });
+    // Only count revenue generated within date filter
+    if(fd1&&cDate&&cDate<fd1) return;
+    if(fd2&&cDate&&cDate>fd2) return;
+    totalGenerated+=c.generatedRevenue||0;
   });
 
   // Cash/commission for selected period
