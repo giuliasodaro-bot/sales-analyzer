@@ -371,6 +371,11 @@ const STORAGE_KEY = 'sales_calls';
   }catch(e){}
 })();
 
+var SCORE_KEYS=['call_control','discovery_depth','belief_shifting','objection_handling','pitch_effectiveness','closing_strength'];
+var EQ_KEY='eq_in_closing';
+var SCORE_LABELS={call_control:'Call control',discovery_depth:'Discovery depth',belief_shifting:'Belief shifting',objection_handling:'Objection handling',pitch_effectiveness:'Pitch effectiveness',closing_strength:'Closing strength'};
+var PHASE_KEYS=['opener','discovery','pitch','objection_handling','close'];
+var PHASE_LABELS={opener:'Opener',discovery:'Discovery',pitch:'Pitch',objection_handling:'Objections',close:'Close'};
 var account='AlwaysCoach', comm=10, callType='pitched', currentResult=null, openCallId=null, fathomData=null;
 
 document.addEventListener('DOMContentLoaded',function(){
@@ -497,11 +502,7 @@ Scoring: 6 main categories (call_control through closing_strength) scored 0-10, 
   btn.disabled=false; btn.innerHTML='▶ Analyze transcript';
 }
 
-var SCORE_LABELS={call_control:'Call control',discovery_depth:'Discovery depth',belief_shifting:'Belief shifting',objection_handling:'Objection handling',pitch_effectiveness:'Pitch effectiveness',closing_strength:'Closing strength'};
-var SCORE_KEYS=['call_control','discovery_depth','belief_shifting','objection_handling','pitch_effectiveness','closing_strength'];
-var EQ_KEY='eq_in_closing';
-var PHASE_KEYS=['opener','discovery','pitch','objection_handling','close'];
-var PHASE_LABELS={opener:'Opener',discovery:'Discovery',pitch:'Pitch',objection_handling:'Objections',close:'Close'};
+
 
 function renderScoreGrid(elId,scores){
   var el=document.getElementById(elId); if(!el) return;
