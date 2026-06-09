@@ -616,6 +616,9 @@ function renderDashboard(){
   var totalGenerated=0;
   allClosed.forEach(function(c){
     if(fa&&c.account!==fa) return;
+    var cDate=(c.dateClosed||c.timestamp||'').substring(0,10);
+    if(fd1&&cDate&&cDate<fd1) return;
+    if(fd2&&cDate&&cDate>fd2) return;
     totalGenerated+=c.generatedRevenue||0;
     projectInstallments(c).forEach(function(r){
       if(!schedMap[r.month]) schedMap[r.month]={active:0,passive:0,commission:0};
