@@ -647,6 +647,7 @@ function renderDashboard(){
         commPeriod+=schedMap[m].commission;
       } else if(m<rangeStart&&m<=todayMonth){
         cashPassive+=schedMap[m].active+schedMap[m].passive;
+        commPeriod+=schedMap[m].commission;
       }
     }
   });
