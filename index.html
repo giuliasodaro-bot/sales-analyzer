@@ -600,8 +600,8 @@ function renderDashboard(){
   var now=nowMonthKey();
   var fd1=document.getElementById('f-date-from')?document.getElementById('f-date-from').value:'';
   var fd2=document.getElementById('f-date-to')?document.getElementById('f-date-to').value:'';
-  var rangeStart=fd1?fd1.substring(0,7):now;
-  var rangeEnd=fd2?fd2.substring(0,7):now;
+  var rangeStart=fd1?fd1.substring(0,7):'0000-00';
+  var rangeEnd=fd2?fd2.substring(0,7):'9999-99';
 
   var closed=calls.filter(function(c){return (c.outcome||'').toLowerCase()==='closed';});
   var taken=calls.filter(function(c){return c.callType!=='no_show';});
