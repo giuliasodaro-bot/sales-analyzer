@@ -43,7 +43,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .type-btn.active .tname{color:var(--accent);}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
-.row4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;}
 .field label{font-size:12px;font-weight:500;color:var(--muted);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em;}
 .field input,.field textarea,.field select{width:100%;border:0.5px solid var(--border-md);border-radius:var(--radius);padding:9px 12px;font-size:14px;font-family:inherit;color:var(--text);background:var(--surface);transition:border-color 0.15s;}
 .field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:var(--accent-mid);}
@@ -55,12 +54,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .field-note a{color:var(--accent);}
 .fathom-row{display:flex;gap:8px;align-items:flex-end;}
 .fathom-row .field{flex:1;}
-.btn-fetch{padding:9px 16px;background:var(--accent-light);color:var(--accent);border:1px solid var(--accent-mid);border-radius:var(--radius);font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;transition:background 0.15s;}
-.btn-fetch:hover{background:#d0e8f8;}
+.btn-fetch{padding:9px 16px;background:var(--accent-light);color:var(--accent);border:1px solid var(--accent-mid);border-radius:var(--radius);font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;}
 .btn-fetch:disabled{opacity:0.45;cursor:not-allowed;}
 .fathom-meta{display:none;background:var(--accent-light);border:0.5px solid var(--accent-mid);border-radius:var(--radius);padding:10px 14px;margin-top:10px;font-size:13px;}
-.fathom-meta .meta-row{display:flex;gap:6px;align-items:center;margin-bottom:3px;}
-.meta-label{font-size:11px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;min-width:70px;}
 .fathom-link{font-size:11px;color:var(--accent-mid);margin-top:6px;word-break:break-all;}
 .fathom-link a{color:var(--accent-mid);}
 .btn-primary{width:100%;padding:13px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-lg);font-size:15px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity 0.15s;margin-bottom:0.5rem;}
@@ -68,7 +64,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .btn-primary:disabled{opacity:0.45;cursor:not-allowed;}
 .btn-save{width:100%;padding:12px;background:var(--surface);color:var(--success);border:1px solid #639922;border-radius:var(--radius-lg);font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background 0.15s;}
 .btn-save:hover:not(:disabled){background:var(--success-light);}
-.btn-save:disabled{opacity:0.45;cursor:not-allowed;}
 .btn-sm{font-size:12px;padding:5px 12px;border-radius:var(--radius);border:0.5px solid var(--border-md);background:var(--surface);cursor:pointer;color:var(--muted);transition:all 0.15s;}
 .btn-sm:hover{border-color:var(--accent-mid);color:var(--accent);}
 .btn-danger{color:var(--danger);border-color:var(--danger);opacity:0.7;}
@@ -77,7 +72,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .status.error{color:var(--danger);}
 .status.success{color:var(--success);}
 .divider{height:0.5px;background:var(--border);margin:1.5rem 0;}
-.overall-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1rem;}
 .stat{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px;text-align:center;}
 .stat-label{font-size:11px;color:var(--muted);margin-bottom:4px;}
 .stat-val{font-size:26px;font-weight:600;}
@@ -89,25 +83,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .bar{height:4px;background:var(--border-md);border-radius:2px;margin-top:5px;}
 .bar-inner{height:4px;border-radius:2px;}
 .bar-inner.hi{background:#639922;}.bar-inner.md{background:#EF9F27;}.bar-inner.lo{background:#E24B4A;}
-.phase-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:1rem;}
+.phase-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:1rem;}
 .phase-card{background:var(--surface2);border-radius:var(--radius);padding:8px;text-align:center;}
 .phase-lbl{font-size:10px;color:var(--muted);margin-bottom:3px;}
 .phase-val{font-size:18px;font-weight:600;}
 .phase-unit{font-size:10px;color:var(--muted);}
-.feedback-box{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px;font-size:14px;line-height:1.75;margin-bottom:1rem;white-space:pre-wrap;}
+.feedback-box{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px;font-size:14px;line-height:1.75;margin-bottom:1rem;}
 .section-title{font-size:14px;font-weight:500;margin-bottom:10px;}
-/* DASHBOARD */
 .dash-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;}
 .dash-header h2{font-size:20px;font-weight:600;}
-.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1rem;}
-.kpi-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1rem;}
+.kpi-grid{display:grid;gap:10px;margin-bottom:1rem;}
 .kpi{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:14px;display:flex;flex-direction:column;}
 .kpi-label{font-size:11px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.05em;min-height:28px;display:flex;align-items:flex-end;}
 .kpi-val{font-size:22px;font-weight:600;color:var(--accent);}
 .kpi-sub{font-size:11px;color:var(--muted);margin-top:2px;}
-.kpi.active-rev .kpi-val{color:var(--success);}
-.kpi.passive-rev .kpi-val{color:var(--purple);}
-.kpi.total-rev .kpi-val{color:var(--accent);}
 .revenue-section{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem 1.5rem;margin-bottom:1rem;}
 .revenue-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:12px;}
 .installment-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:0.5px solid var(--border);font-size:13px;}
@@ -117,23 +106,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .inst-badge{font-size:11px;padding:2px 8px;border-radius:20px;}
 .inst-collected{background:var(--success-light);color:var(--success);}
 .inst-projected{background:var(--purple-light);color:var(--purple);}
-/* LOSS ANALYSIS */
-.loss-section{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem 1.5rem;margin-bottom:1rem;}
-.loss-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:12px;}
-.loss-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
-.loss-label{font-size:12px;color:var(--muted);min-width:140px;}
-.loss-track{flex:1;height:6px;background:var(--border-md);border-radius:3px;}
-.loss-fill{height:6px;border-radius:3px;background:var(--danger);}
-.loss-val{font-size:12px;font-weight:600;color:var(--danger);min-width:30px;text-align:right;}
-/* FILTERS */
 .filters-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1rem;}
 .filters-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr auto;gap:8px;align-items:flex-end;}
 .filter-field label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:5px;}
 .filter-field input,.filter-field select{width:100%;border:0.5px solid var(--border-md);border-radius:var(--radius);padding:7px 10px;font-size:13px;font-family:inherit;color:var(--text);background:var(--surface);}
-.filter-field input:focus,.filter-field select:focus{outline:none;border-color:var(--accent-mid);}
 .btn-reset{padding:7px 14px;font-size:13px;border-radius:var(--radius);border:0.5px solid var(--border-md);background:var(--surface2);cursor:pointer;color:var(--muted);}
-.btn-reset:hover{color:var(--text);}
-/* TABLE */
 .calls-table{width:100%;border-collapse:collapse;font-size:13px;}
 .calls-table th{text-align:left;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;padding:8px 12px;border-bottom:0.5px solid var(--border-md);white-space:nowrap;}
 .calls-table td{padding:10px 12px;border-bottom:0.5px solid var(--border);vertical-align:middle;}
@@ -148,21 +125,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .badge-pitched{background:var(--accent-light);color:var(--accent);}
 .badge-fdq{background:var(--surface2);color:var(--muted);}
 .empty-state{text-align:center;padding:3rem 1rem;color:var(--muted);font-size:14px;}
-/* MODAL */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:100;align-items:flex-start;justify-content:center;padding:2rem 1rem;overflow-y:auto;}
 .modal-overlay.open{display:flex;}
 .modal{background:var(--surface);border-radius:var(--radius-lg);max-width:700px;width:100%;padding:1.5rem;position:relative;margin:auto;}
 .modal-close{position:absolute;top:1rem;right:1rem;background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);}
-.modal-close:hover{color:var(--text);}
-.modal-title{font-size:17px;font-weight:600;margin-bottom:4px;}
-.modal-meta{font-size:13px;color:var(--muted);margin-bottom:6px;}
-.modal-fathom{font-size:12px;margin-bottom:1rem;}
-.modal-fathom a{color:var(--accent-mid);}
 .modal-section{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin:1rem 0 8px;}
-.refund-row{display:flex;gap:8px;align-items:flex-end;margin-top:10px;}
-.refund-row .field{flex:1;}
-.btn-refund{padding:9px 16px;background:var(--danger-light);color:var(--danger);border:1px solid var(--danger);border-radius:var(--radius);font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;}
-.btn-refund:hover{opacity:0.85;}
 .spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;}
 .spinner-sm{border-color:rgba(24,95,165,0.25);border-top-color:var(--accent);}
 @keyframes spin{to{transform:rotate(360deg);}}
@@ -170,7 +137,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </style>
 </head>
 <body>
-
 <div class="nav">
   <button class="nav-btn active" onclick="showPage('analyzer',this)">Analyze</button>
   <button class="nav-btn" onclick="showPage('dashboard',this)">Dashboard</button>
@@ -178,89 +144,64 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 <!-- ANALYZER -->
 <div class="page active" id="page-analyzer">
-
   <div class="card">
     <div class="card-title">Account</div>
     <div class="account-grid">
-      <button class="account-btn active" onclick="selectAccount(this,'AlwaysCoach',10)">
-        <div class="name">AlwaysCoach</div><div class="comm">10% commission</div>
-      </button>
-      <button class="account-btn" onclick="selectAccount(this,'Incontrera',14)">
-        <div class="name">Incontrera</div><div class="comm">14% commission</div>
-      </button>
-      <button class="account-btn" onclick="selectAccount(this,'Moves Method',8)">
-        <div class="name">Moves Method</div><div class="comm">8% commission</div>
-      </button>
+      <button class="account-btn active" onclick="selectAccount(this,'AlwaysCoach',10)"><div class="name">AlwaysCoach</div><div class="comm">10% commission</div></button>
+      <button class="account-btn" onclick="selectAccount(this,'Incontrera',14)"><div class="name">Incontrera</div><div class="comm">14% commission</div></button>
+      <button class="account-btn" onclick="selectAccount(this,'Moves Method',8)"><div class="name">Moves Method</div><div class="comm">8% commission</div></button>
     </div>
   </div>
-
   <div class="card">
     <div class="card-title">Call type</div>
     <div class="type-grid">
-      <button class="type-btn active" onclick="selectType(this,'pitched')">
-        <div class="tname">Pitched</div><div class="tdesc">Discovery + pitch + close attempt</div>
-      </button>
-      <button class="type-btn" onclick="selectType(this,'not_pitched')">
-        <div class="tname">Not Pitched</div><div class="tdesc">Call happened, no pitch made</div>
-      </button>
-      <button class="type-btn" onclick="selectType(this,'fdq')">
-        <div class="tname">FDQ</div><div class="tdesc">Pitched but prospect not qualified</div>
-      </button>
-      <button class="type-btn" onclick="selectType(this,'no_show')">
-        <div class="tname">No Show</div><div class="tdesc">Prospect didn't show up</div>
-      </button>
+      <button class="type-btn active" onclick="selectType(this,'pitched')"><div class="tname">Pitched</div><div class="tdesc">Discovery + pitch + close attempt</div></button>
+      <button class="type-btn" onclick="selectType(this,'not_pitched')"><div class="tname">Not Pitched</div><div class="tdesc">Call happened, no pitch made</div></button>
+      <button class="type-btn" onclick="selectType(this,'fdq')"><div class="tname">FDQ</div><div class="tdesc">Pitched but prospect not qualified</div></button>
+      <button class="type-btn" onclick="selectType(this,'no_show')"><div class="tname">No Show</div><div class="tdesc">Prospect didn't show up</div></button>
     </div>
   </div>
-
   <div class="card">
     <div class="card-title">Fathom recording (optional)</div>
     <div class="fathom-row">
       <div class="field"><input type="url" id="fathom-url" placeholder="https://fathom.video/share/..." oninput="onFathomInput()"/></div>
       <button class="btn-fetch" id="btn-fetch" onclick="fetchFathom()" disabled>Fetch metadata</button>
     </div>
-    <div class="fathom-meta" id="fathom-meta"></div>
-    <p class="field-note" style="margin-top:8px">Paste a Fathom share link — the tool will attempt to pull attendees, date, and meeting title automatically.</p>
+    <div id="fathom-meta" class="fathom-meta"></div>
   </div>
-
   <div class="card">
     <div class="card-title">Call details</div>
-    <div class="row2" style="margin-bottom:10px">
+    <div class="row3" style="margin-bottom:10px">
       <div class="field"><label>Closer name</label><input type="text" id="closer" placeholder="Auto-detected"/></div>
       <div class="field"><label>Client / prospect</label><input type="text" id="client" placeholder="Auto-detected"/></div>
+      <div class="field"><label>Call date</label><input type="date" id="call-date"/></div>
     </div>
     <div class="row2">
-      <div class="field"><label>Call date</label><input type="date" id="call-date"/></div>
-      <div class="field"><label>Refund amount</label>
-        <div class="prefix-wrap"><span class="prefix">$</span><input type="number" id="refund" placeholder="0" min="0"/></div>
-      </div>
+      <div class="field"><label>Refund amount</label><div class="prefix-wrap"><span class="prefix">$</span><input type="number" id="refund" placeholder="0" min="0"/></div></div>
     </div>
   </div>
-
   <div class="card">
     <div class="card-title">Anthropic API key</div>
     <div class="field"><input type="password" id="api-key" placeholder="sk-ant-..."/></div>
     <p class="field-note">Stored only in this browser tab. Get one at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></p>
   </div>
-
   <div class="card">
     <div class="card-title">Call transcript</div>
-    <div class="field"><textarea id="transcript" placeholder="Paste the full call transcript here...&#10;&#10;Include speaker labels (e.g. Closer: / Prospect:) for best results."></textarea></div>
+    <div class="field"><textarea id="transcript" placeholder="Paste the full call transcript here..."></textarea></div>
   </div>
-
   <button class="btn-primary" id="btn-analyze" onclick="runAnalysis()">▶ Analyze transcript</button>
   <div class="status" id="status"></div>
-
   <div id="results">
     <div class="divider"></div>
     <div class="section-title">Overall performance</div>
-    <div class="overall-grid" id="r-overall-grid"></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1rem" id="r-overall-grid"></div>
     <div class="section-title">Score breakdown</div>
     <div class="score-grid" id="score-grid"></div>
     <div class="section-title">Phase durations</div>
     <div class="phase-grid" id="phase-grid"></div>
     <div class="section-title">Coaching feedback</div>
     <div class="feedback-box" id="feedback"></div>
-    <button class="btn-save" id="btn-save" onclick="saveCall()">✓ Save to dashboard</button>
+    <button class="btn-save" onclick="saveCall()">✓ Save to dashboard</button>
     <div class="status" id="save-status"></div>
   </div>
 </div>
@@ -269,13 +210,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <div class="page" id="page-dashboard">
   <div class="dash-header">
     <h2>Dashboard</h2>
-    <div style="display:flex;gap:6px;align-items:center">
-      <button class="btn-sm" onclick="exportData()">&#8595; Export</button>
-      <label class="btn-sm" style="cursor:pointer;margin:0">&#8593; Import<input type="file" accept=".json" onchange="importData(event)" style="display:none"/></label>
+    <div style="display:flex;gap:6px">
+      <button class="btn-sm" onclick="exportData()">↓ Export</button>
+      <label class="btn-sm" style="cursor:pointer;margin:0">↑ Import<input type="file" accept=".json" id="import-input" onchange="importData(event)" style="display:none"/></label>
       <button class="btn-sm btn-danger" onclick="clearAll()">Clear all</button>
     </div>
   </div>
-
   <!-- Filters -->
   <div class="filters-card">
     <div class="filters-row">
@@ -288,72 +228,59 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div class="filter-field"><label>Call type</label>
         <select id="f-type" onchange="renderDashboard()">
           <option value="">All types</option>
-          <option value="pitched">Pitched</option><option value="not_pitched">Not Pitched</option><option value="fdq">FDQ</option><option value="no_show">No Show</option>
+          <option value="pitched">Pitched</option>
+          <option value="not_pitched">Not Pitched</option>
+          <option value="fdq">FDQ</option>
+          <option value="no_show">No Show</option>
         </select>
       </div>
-      <div class="filter-field"><label>Client</label>
-        <input type="text" id="f-client" placeholder="Search..." oninput="renderDashboard()"/>
-      </div>
-      <div class="filter-field"><label>From</label>
-        <input type="date" id="f-date-from" onchange="renderDashboard()"/>
-      </div>
-      <div class="filter-field"><label>To</label>
-        <input type="date" id="f-date-to" onchange="renderDashboard()"/>
-      </div>
+      <div class="filter-field"><label>Client</label><input type="text" id="f-client" placeholder="Search..." oninput="renderDashboard()"/></div>
+      <div class="filter-field"><label>From</label><input type="date" id="f-date-from" onchange="renderDashboard()"/></div>
+      <div class="filter-field"><label>To</label><input type="date" id="f-date-to" onchange="renderDashboard()"/></div>
       <button class="btn-reset" onclick="resetFilters()">Reset</button>
     </div>
   </div>
-
   <!-- Row 1: Revenue -->
-  <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:1rem">
-    <div class="kpi active-rev"><div class="kpi-label">Cash collected</div><div class="kpi-val" id="kpi-active">$0</div><div class="kpi-sub">this month</div></div>
-    <div class="kpi passive-rev"><div class="kpi-label">Cash collected</div><div class="kpi-val" id="kpi-passive">$0</div><div class="kpi-sub">from previous months</div></div>
-    <div class="kpi" style="border-color:#639922"><div class="kpi-label">Commission this month</div><div class="kpi-val" id="kpi-total-rev" style="color:var(--success)">$0</div><div class="kpi-sub">active + passive</div></div>
+  <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr)">
+    <div class="kpi"><div class="kpi-label">Cash collected (period)</div><div class="kpi-val" id="kpi-cash-period" style="color:var(--success)">$0</div></div>
+    <div class="kpi"><div class="kpi-label">Cash collected (prev months)</div><div class="kpi-val" id="kpi-cash-passive" style="color:var(--purple)">$0</div></div>
+    <div class="kpi"><div class="kpi-label">Commission (period)</div><div class="kpi-val" id="kpi-comm-period" style="color:var(--success)">$0</div></div>
     <div class="kpi"><div class="kpi-label">Revenue generated</div><div class="kpi-val" id="kpi-generated">$0</div><div class="kpi-sub">total contract value</div></div>
   </div>
-
   <!-- Row 2: Call counts -->
-  <div class="kpi-grid" style="grid-template-columns:repeat(6,1fr);margin-bottom:1rem">
+  <div class="kpi-grid" style="grid-template-columns:repeat(6,1fr)">
     <div class="kpi"><div class="kpi-label">Calls booked</div><div class="kpi-val" id="kpi-booked">0</div></div>
     <div class="kpi"><div class="kpi-label">Calls taken</div><div class="kpi-val" id="kpi-taken">0</div></div>
-    <div class="kpi"><div class="kpi-label">Calls pitched</div><div class="kpi-val" id="kpi-pitched">0</div></div>
+    <div class="kpi"><div class="kpi-label">Calls pitched</div><div class="kpi-val" id="kpi-pitched-count">0</div></div>
     <div class="kpi"><div class="kpi-label">Calls closed</div><div class="kpi-val" id="kpi-closed-count" style="color:var(--success)">0</div></div>
     <div class="kpi"><div class="kpi-label">Calls FDQ</div><div class="kpi-val" id="kpi-fdq-count">0</div></div>
     <div class="kpi"><div class="kpi-label">Avg calls / day</div><div class="kpi-val" id="kpi-avg-day">—</div><div class="kpi-sub" id="kpi-avg-day-sub"></div></div>
   </div>
-
   <!-- Row 3: Close rates -->
-  <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:1rem">
+  <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr)">
     <div class="kpi"><div class="kpi-label">Close rate (all booked)</div><div class="kpi-val" id="kpi-cr-booked">—</div><div class="kpi-sub" id="kpi-cr-booked-sub"></div></div>
     <div class="kpi"><div class="kpi-label">Close rate (showed)</div><div class="kpi-val" id="kpi-cr-showed">—</div><div class="kpi-sub" id="kpi-cr-showed-sub"></div></div>
     <div class="kpi"><div class="kpi-label">Close rate (pitched incl. FDQ)</div><div class="kpi-val" id="kpi-cr-pitched-all">—</div><div class="kpi-sub" id="kpi-cr-pitched-all-sub"></div></div>
     <div class="kpi"><div class="kpi-label">Close rate (pitched excl. FDQ)</div><div class="kpi-val" id="kpi-cr-pitched-excl">—</div><div class="kpi-sub" id="kpi-cr-pitched-excl-sub"></div></div>
   </div>
-
-  <!-- Synthesized feedback -->
-  <div class="card" id="synth-section" style="display:none;margin-bottom:1rem">
+  <!-- Coaching synthesis -->
+  <div class="card" id="synth-section" style="display:none">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
       <div class="card-title" style="margin:0">Coaching synthesis</div>
       <button class="btn-fetch" id="btn-synth" onclick="synthesizeFeedback()">Generate insights</button>
     </div>
     <div id="synth-content" style="font-size:13px;color:var(--muted)">Click "Generate insights" to synthesize coaching feedback across filtered calls.</div>
   </div>
-
-  <!-- Aggregate scores -->
-  <div id="agg-section" style="display:none;margin-bottom:1rem;">
-    <div class="card">
-      <div class="card-title">Avg score breakdown</div>
-      <div class="score-grid" id="agg-scores"></div>
-      <div class="card-title" style="margin-top:1rem">Avg phase durations</div>
-      <div class="phase-grid" id="agg-phases"></div>
-    </div>
+  <!-- Avg scores -->
+  <div class="card" id="agg-section" style="display:none">
+    <div class="card-title">Avg score breakdown</div>
+    <div class="score-grid" id="agg-scores"></div>
+    <div class="card-title" style="margin-top:1rem">Avg phase durations</div>
+    <div class="phase-grid" id="agg-phases"></div>
   </div>
-
-  <div class="card" style="padding:0;overflow:hidden">
-    <div id="calls-list"></div>
-  </div>
-
-  <!-- Installment projections at bottom -->
+  <!-- Calls table -->
+  <div class="card" style="padding:0;overflow:hidden"><div id="calls-list"></div></div>
+  <!-- Installment schedule -->
   <div class="revenue-section" id="installment-section" style="display:none;margin-top:1rem">
     <div class="revenue-title">Revenue schedule — projected installments</div>
     <div id="installment-list"></div>
@@ -361,13 +288,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </div>
 
 <!-- MODAL -->
-<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+<div class="modal-overlay" id="modal" onclick="closeModalOverlay(event)">
   <div class="modal">
     <button class="modal-close" onclick="document.getElementById('modal').classList.remove('open')">✕</button>
-    <div class="modal-title" id="m-title"></div>
-    <div class="modal-meta" id="m-meta"></div>
-    <div class="modal-fathom" id="m-fathom"></div>
-    <div class="overall-grid" id="m-overall"></div>
+    <div style="font-size:17px;font-weight:600;margin-bottom:4px" id="m-title"></div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:6px" id="m-meta"></div>
+    <div style="font-size:12px;margin-bottom:1rem" id="m-fathom"></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1rem" id="m-overall"></div>
     <div class="modal-section">Score breakdown</div>
     <div class="score-grid" id="m-scores"></div>
     <div class="modal-section">Phase durations</div>
@@ -376,8 +303,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="feedback-box" id="m-feedback"></div>
     <div class="modal-section">Update call</div>
     <div class="row3" style="margin-bottom:8px">
-      <div class="field">
-        <label>Outcome</label>
+      <div class="field"><label>Outcome</label>
         <select id="m-outcome">
           <option value="closed">Closed</option>
           <option value="no_close">No close</option>
@@ -385,769 +311,580 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
           <option value="unknown">Unknown</option>
         </select>
       </div>
-      <div class="field">
-        <label>Call date</label>
-        <input type="date" id="m-call-date"/>
-      </div>
-      <div class="field">
-        <label>Date closed</label>
-        <input type="date" id="m-date-closed"/>
-      </div>
+      <div class="field"><label>Call date</label><input type="date" id="m-call-date"/></div>
+      <div class="field"><label>Date closed</label><input type="date" id="m-date-closed"/></div>
     </div>
     <div class="row3" style="margin-bottom:8px">
-      <div class="field">
-        <label>Cash collected</label>
-        <div class="prefix-wrap"><span class="prefix">$</span><input type="number" id="m-cash" placeholder="0" min="0"/></div>
-      </div>
-    <div class="row3" style="margin-bottom:8px">
-      <div class="field">
-        <label>Revenue generated</label>
-        <div class="prefix-wrap"><span class="prefix">$</span><input type="number" id="m-revenue" placeholder="0" min="0"/></div>
-      </div>
-      <div class="field">
-        <label>Installments</label>
-        <input type="number" id="m-installments" placeholder="1" min="1"/>
-      </div>
-      <div class="field">
-        <label>Refund</label>
-        <div class="prefix-wrap"><span class="prefix">$</span><input type="number" id="m-refund-input" placeholder="0" min="0"/></div>
-      </div>
+      <div class="field"><label>Cash collected</label><div class="prefix-wrap"><span class="prefix">$</span><input type="number" id="m-cash" placeholder="0" min="0"/></div></div>
+      <div class="field"><label>Revenue generated</label><div class="prefix-wrap"><span class="prefix">$</span><input type="number" id="m-revenue" placeholder="0" min="0"/></div></div>
+      <div class="field"><label>Installments</label><input type="number" id="m-installments" placeholder="1" min="1"/></div>
+    </div>
+    <div class="row2" style="margin-bottom:8px">
+      <div class="field"><label>Refund</label><div class="prefix-wrap"><span class="prefix">$</span><input type="number" id="m-refund" placeholder="0" min="0"/></div></div>
     </div>
     <button class="btn-save" style="margin-bottom:8px" onclick="updateCall()">Save updates</button>
-    <div class="status" id="m-refund-status"></div>
-    <div style="margin-top:6px">
-      <button class="btn-sm btn-danger" onclick="deleteCall()">Delete this call</button>
-    </div>
+    <div class="status" id="m-status"></div>
+    <button class="btn-sm btn-danger" onclick="deleteCall()">Delete this call</button>
   </div>
 </div>
 
 <script>
 const STORAGE_KEY = 'sales_calls';
-(function migrate(){const old=['sales_calls_v1','sales_calls_v2','sales_calls_v3'];try{if(JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]').length)return;}catch{}for(const k of old){try{const d=JSON.parse(localStorage.getItem(k)||'[]');if(d.length){localStorage.setItem(STORAGE_KEY,JSON.stringify(d));return;}}catch{}}})();
-let account='AlwaysCoach', comm=10, callType='pitched', currentResult=null, openCallId=null, fathomData=null;
-// Pre-fill call date with today
-document.addEventListener('DOMContentLoaded',()=>{
-  const d=document.getElementById('call-date');
+// Migrate from old versioned keys
+(function(){
+  try{
+    if(JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]').length) return;
+    for(var k of['sales_calls_v1','sales_calls_v2','sales_calls_v3']){
+      var d=JSON.parse(localStorage.getItem(k)||'[]');
+      if(d.length){localStorage.setItem(STORAGE_KEY,JSON.stringify(d));break;}
+    }
+  }catch(e){}
+})();
+
+var account='AlwaysCoach', comm=10, callType='pitched', currentResult=null, openCallId=null, fathomData=null;
+
+document.addEventListener('DOMContentLoaded',function(){
+  var d=document.getElementById('call-date');
   if(d) d.value=new Date().toISOString().substring(0,10);
-  // Clean up any stuck progress div
-  const stuck=document.getElementById('import-progress');
-  if(stuck&&stuck.parentNode) stuck.parentNode.removeChild(stuck);
 });
 
 function showPage(id,btn){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active');});
   document.getElementById('page-'+id).classList.add('active');
   btn.classList.add('active');
-  if(id==='dashboard'){try{renderDashboard();}catch(e){console.error('Dashboard error:',e);}}
+  if(id==='dashboard') renderDashboard();
 }
 function selectAccount(el,name,c){
-  document.querySelectorAll('.account-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.account-btn').forEach(function(b){b.classList.remove('active');});
   el.classList.add('active'); account=name; comm=c;
 }
 function selectType(el,type){
-  document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.type-btn').forEach(function(b){b.classList.remove('active');});
   el.classList.add('active'); callType=type;
 }
 
 // FATHOM
 function onFathomInput(){
-  const val=document.getElementById('fathom-url').value.trim();
+  var val=document.getElementById('fathom-url').value.trim();
   document.getElementById('btn-fetch').disabled=!val.includes('fathom.video');
-  if(!val){hideFathomMeta();fathomData=null;}
+  if(!val){document.getElementById('fathom-meta').style.display='none';fathomData=null;}
 }
-function hideFathomMeta(){const m=document.getElementById('fathom-meta');m.style.display='none';m.innerHTML='';}
 async function fetchFathom(){
-  const url=document.getElementById('fathom-url').value.trim();
+  var url=document.getElementById('fathom-url').value.trim();
   if(!url) return;
-  const btn=document.getElementById('btn-fetch');
-  btn.disabled=true; btn.innerHTML='<span class="spinner spinner-sm" style="border-top-color:var(--accent)"></span>';
-  const proxyUrl='https://api.allorigins.win/get?url='+encodeURIComponent(url);
+  var btn=document.getElementById('btn-fetch');
+  btn.disabled=true; btn.innerHTML='...';
   try{
-    const resp=await fetch(proxyUrl);
-    if(!resp.ok) throw new Error();
-    const data=await resp.json();
-    const html=data.contents||'';
-    const ogTitle=html.match(/<meta[^>]*property=["']og:title["'][^>]*content=["']([^"']+)["']/i)||html.match(/<meta[^>]*content=["']([^"']+)["'][^>]*property=["']og:title["']/i);
-    const titleMatch=html.match(/<title[^>]*>([^<]+)<\/title>/i);
-    const ogDate=html.match(/\b(\d{4}-\d{2}-\d{2})\b/);
-    const attendeeMatch=html.match(/attendee[s]?[^:]*:\s*([^\n<]{5,80})/i)||html.match(/participant[s]?[^:]*:\s*([^\n<]{5,80})/i);
-    fathomData={url,title:((ogTitle&&ogTitle[1])||(titleMatch&&titleMatch[1])||'').replace(' | Fathom','').trim(),date:ogDate?ogDate[1]:'',attendees:attendeeMatch?attendeeMatch[1].trim():''};
-    showFathomMeta(fathomData,false);
+    var resp=await fetch('https://api.allorigins.win/get?url='+encodeURIComponent(url));
+    var data=await resp.json();
+    var html=data.contents||'';
+    var ogTitle=html.match(/<meta[^>]*property=["']og:title["'][^>]*content=["']([^"']+)["']/i);
+    var titleMatch=html.match(/<title[^>]*>([^<]+)<\/title>/i);
+    var ogDate=html.match(/\b(\d{4}-\d{2}-\d{2})\b/);
+    var attendeeMatch=html.match(/attendee[s]?[^:]*:\s*([^\n<]{5,80})/i);
+    fathomData={url:url,title:((ogTitle&&ogTitle[1])||(titleMatch&&titleMatch[1])||'').replace(' | Fathom','').trim(),date:ogDate?ogDate[1]:'',attendees:attendeeMatch?attendeeMatch[1].trim():''};
     if(fathomData.attendees&&!document.getElementById('client').value.trim()) document.getElementById('client').value=fathomData.attendees;
     if(fathomData.date) document.getElementById('call-date').value=fathomData.date;
+    var m=document.getElementById('fathom-meta');
+    m.style.display='block';
+    m.innerHTML=(fathomData.title?'<div><b>Meeting:</b> '+fathomData.title+'</div>':'')+(fathomData.date?'<div><b>Date:</b> '+fathomData.date+'</div>':'')+(fathomData.attendees?'<div><b>Attendees:</b> '+fathomData.attendees+'</div>':'')+'<div class="fathom-link"><a href="'+url+'" target="_blank">'+url+'</a></div>';
   }catch(e){
-    fathomData={url,title:'',date:'',attendees:''};
-    showFathomMeta(fathomData,true);
-  }finally{btn.disabled=false;btn.innerHTML='Fetch metadata';}
-}
-function showFathomMeta(d,corsBlocked){
-  const m=document.getElementById('fathom-meta');
-  m.style.display='block';
-  if(corsBlocked){
-    m.innerHTML=`<div style="color:var(--warn);font-size:13px;margin-bottom:6px">⚠ Fathom blocked automatic fetch — link saved.</div><div class="fathom-link"><a href="${d.url}" target="_blank">${d.url}</a></div>`;
-  }else{
-    m.innerHTML=`${d.title?`<div class="meta-row"><span class="meta-label">Meeting</span><span>${d.title}</span></div>`:''}${d.date?`<div class="meta-row"><span class="meta-label">Date</span><span>${d.date}</span></div>`:''}${d.attendees?`<div class="meta-row"><span class="meta-label">Attendees</span><span>${d.attendees}</span></div>`:''}${!d.title&&!d.date&&!d.attendees?'<div style="color:var(--muted);font-size:13px">Link saved — fill details manually.</div>':''}<div class="fathom-link"><a href="${d.url}" target="_blank">${d.url}</a></div>`;
+    fathomData={url:url,title:'',date:'',attendees:''};
+    var m=document.getElementById('fathom-meta');
+    m.style.display='block';
+    m.innerHTML='<span style="color:var(--warn)">Link saved (fetch blocked)</span><div class="fathom-link"><a href="'+url+'" target="_blank">'+url+'</a></div>';
   }
+  btn.disabled=false; btn.innerHTML='Fetch metadata';
 }
 
 // STORAGE
-function loadCalls(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');}catch{return[];}}
+function loadCalls(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');}catch(e){return[];}}
 function saveCalls(c){localStorage.setItem(STORAGE_KEY,JSON.stringify(c));}
+
+// HELPERS
 function cls(v){return v>=75?'hi':v>=50?'md':'lo';}
-function setStatus(id,msg,type){const el=document.getElementById(id);el.textContent=msg;el.className='status'+(type?' '+type:'');}
-function avgScore(s){const vals=Object.values(s).filter(v=>typeof v==='number');return vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):0;}
+function setStatus(id,msg,type){var el=document.getElementById(id);if(!el)return;el.textContent=msg;el.className='status'+(type?' '+type:'');}
+function avgScore(s){if(!s)return 0;var vals=Object.values(s).filter(function(v){return typeof v==='number';});return vals.length?Math.round(vals.reduce(function(a,b){return a+b;},0)/vals.length):0;}
 function fmtMoney(n){return n?'$'+Math.round(n).toLocaleString():'—';}
 function monthKey(d){return d.toISOString().substring(0,7);}
 function nowMonthKey(){return monthKey(new Date());}
 
 // ANALYZE
 async function runAnalysis(){
-  const transcript=document.getElementById('transcript').value.trim();
-  const apiKey=document.getElementById('api-key').value.trim();
+  var transcript=document.getElementById('transcript').value.trim();
+  var apiKey=document.getElementById('api-key').value.trim();
   if(!transcript){setStatus('status','Paste a transcript first.','error');return;}
   if(!apiKey){setStatus('status','Enter your Anthropic API key.','error');return;}
-  const btn=document.getElementById('btn-analyze');
+  var btn=document.getElementById('btn-analyze');
   btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Analyzing...';
-  setStatus('status','Running NEPQ / SPIN / IFS analysis...','');
+  setStatus('status','Analyzing...','');
   document.getElementById('results').style.display='none';
-
-  const refundAmt=parseFloat(document.getElementById('refund').value)||0;
-  const isFDQ=callType==='not_pitched'||callType==='no_show';
-
-  const system=`You are an expert sales coach scoring calls using NEPQ, SPIN, and IFS frameworks.
-Return ONLY a valid JSON object — no markdown, no preamble.
-
-Also extract from the transcript:
-- "closer_name": name of the salesperson (the one selling), empty string if unclear
-- "client_name": name of the prospect/client (the one being sold to), empty string if unclear
-- "generated_revenue": total contract/deal value in USD as a number (0 if not closed or not mentioned)
-- "cash_collected": amount paid upfront/today in USD as a number (0 if not mentioned)
-- "installments": number of monthly installments as integer (1 if single payment, 0 if not closed)
-
-{
-  "closer_name": "",
-  "client_name": "",
-  "generated_revenue": 0,
-  "cash_collected": 0,
-  "installments": 0,
-  "scores": {
-    "call_control": <0-100>,
-    "discovery_depth": <0-100>,
-    "belief_shifting": <0-100>,
-    "objection_handling": <0-100>,
-    "pitch_effectiveness": <0-100>,
-    "closing_strength": <0-100>,
-    "eq_in_closing": <0-100>
-  },
-  "phases": {"opener":<min>,"discovery":<min>,"pitch":<min>,"objection_handling":<min>,"close":<min>},
-  "strengths": ["<specific strength 1>","<specific strength 2>","<specific strength 3>"],
-  "improvements": ["<specific improvement 1>","<specific improvement 2>","<specific improvement 3>"],
-  "outcome": "<closed|no_close|follow_up|unknown>"
-}
-
-${isFDQ?'This is a Not Pitched or No Show call — adjust scoring accordingly. Outcome should be follow_up unless clearly stated otherwise.':''}
-
-Scoring rubrics (0-100 each):
-- call_control: Did the closer lead the frame, set agenda, maintain authority throughout? (0=no control, 100=perfect frame control)
-- discovery_depth: Quality and depth of discovery — SPIN + NEPQ combined: situation/problem/implication questions AND neuro-emotional questions connecting pain to identity/future (0=surface only, 100=deep pain uncovered)
-- belief_shifting: Did the closer challenge limiting beliefs and reframe the prospect's story? (0=none, 100=powerful reframes)
-- objection_handling: Were objections neutralised at root level vs pressure tactics? (0=caved or ignored, 100=elegant root-level resolution)
-- pitch_effectiveness: Relevant, benefit-led, connected to pain uncovered in discovery? (0=generic, 100=perfectly tailored)
-- closing_strength: Assumptive, smooth, decisive — clear ask for the decision, no hesitation? (0=no ask, 100=strong assumptive close)
-- eq_in_closing: Emotional attunement throughout, especially in close — pacing, mirroring, detecting and responding to shifts? (0=robotic, 100=deeply attuned)`;
-
+  var refundAmt=parseFloat(document.getElementById('refund').value)||0;
+  var isNoPitch=callType==='not_pitched'||callType==='no_show';
+  var system='You are an expert sales coach. Return ONLY valid JSON, no markdown.\n\nExtract from transcript:\n- closer_name: salesperson name (empty if unclear)\n- client_name: prospect name (empty if unclear)\n- generated_revenue: total contract value USD (0 if not closed)\n- cash_collected: amount paid today USD (0 if not mentioned)\n- installments: number of monthly installments (1 if single, 0 if not closed)\n\n{\n  "closer_name":"","client_name":"","generated_revenue":0,"cash_collected":0,"installments":0,\n  "scores":{"call_control":<0-100>,"discovery_depth":<0-100>,"belief_shifting":<0-100>,"objection_handling":<0-100>,"pitch_effectiveness":<0-100>,"closing_strength":<0-100>,"eq_in_closing":<0-100>},\n  "phases":{"opener":<min>,"discovery":<min>,"pitch":<min>,"objection_handling":<min>,"close":<min>},\n  "strengths":["<strength1>","<strength2>","<strength3>"],\n  "improvements":["<improvement1>","<improvement2>","<improvement3>"],\n  "outcome":"<closed|no_close|follow_up|unknown>"\n}\n\n'+(isNoPitch?'No pitch was made. Score accordingly. Outcome = follow_up unless stated otherwise.\n\n':'')+'Scores: call_control=frame/agenda/authority; discovery_depth=SPIN+NEPQ quality; belief_shifting=challenging limiting beliefs; objection_handling=root-level neutralisation; pitch_effectiveness=tailored benefit-led pitch; closing_strength=assumptive decisive ask; eq_in_closing=emotional attunement throughout.';
   try{
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+    var resp=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
       headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1200,system,messages:[{role:'user',content:`Account:${account}\nType:${callType}\n\nTRANSCRIPT:\n${transcript}`}]})
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1200,system:system,messages:[{role:'user',content:'Account:'+account+'\nType:'+callType+'\n\nTRANSCRIPT:\n'+transcript}]})
     });
-    const data=await resp.json();
+    var data=await resp.json();
     if(data.error) throw new Error(data.error.message);
-    const text=data.content.map(b=>b.text||'').join('');
-    const jsonMatch=text.replace(/```json|```/g,'').trim().match(/\{[\s\S]*\}/);
-    if(!jsonMatch) throw new Error('No JSON in response');
-    const parsed=JSON.parse(jsonMatch[0]);
-
-    // Auto-fill names
+    var text=data.content.map(function(b){return b.text||'';}).join('');
+    var clean=text.replace(/```json|```/g,'').trim();
+    var s=clean.indexOf('{'), e=clean.lastIndexOf('}');
+    if(s<0||e<0) throw new Error('No JSON in response');
+    var parsed=JSON.parse(clean.substring(s,e+1));
     if(parsed.closer_name&&!document.getElementById('closer').value.trim()) document.getElementById('closer').value=parsed.closer_name;
     if(parsed.client_name&&!document.getElementById('client').value.trim()) document.getElementById('client').value=parsed.client_name;
-    const finalCloser=document.getElementById('closer').value.trim()||parsed.closer_name||'Unknown';
-    const finalClient=document.getElementById('client').value.trim()||parsed.client_name||'';
-
-    const genRev=parsed.generated_revenue||0;
-    const cashCol=parsed.cash_collected||0;
-    const installments=parsed.installments||0;
-    const effectiveRefund=Math.min(refundAmt, genRev);
-    const effectiveGenRev=genRev-effectiveRefund;
-    const effectiveCash=effectiveRefund>=genRev?0:cashCol;
-
+    var finalCloser=document.getElementById('closer').value.trim()||parsed.closer_name||'Unknown';
+    var finalClient=document.getElementById('client').value.trim()||parsed.client_name||'';
+    var genRev=parsed.generated_revenue||0;
+    var cashCol=parsed.cash_collected||0;
+    var installments=parsed.installments||0;
+    var effectiveRefund=Math.min(refundAmt,genRev);
+    var effectiveGenRev=genRev-effectiveRefund;
+    var effectiveCash=effectiveRefund>=genRev?0:cashCol;
+    var cd=document.getElementById('call-date').value;
+    var fd=fathomData?fathomData.date:'';
+    var ts=(fd||cd)?((fd||cd)+'T12:00:00.000Z'):new Date().toISOString();
     currentResult={
-      ...parsed,
-      account,comm,callType,
+      scores:parsed.scores,phases:parsed.phases,strengths:parsed.strengths||[],improvements:parsed.improvements||[],outcome:parsed.outcome||'unknown',
+      account:account,comm:comm,callType:callType,
       closer:finalCloser,client:finalClient,
-      generatedRevenue:effectiveGenRev,
-      cashCollected:effectiveCash,
-      installments,
-      refund:effectiveRefund,
-      fathom:fathomData||null,
-      transcript:document.getElementById('transcript').value.trim(),
-      timestamp:(()=>{
-        const cd=document.getElementById('call-date').value;
-        const fd=fathomData?.date;
-        return (fd||cd)?((fd||cd)+'T12:00:00.000Z'):new Date().toISOString();
-      })(),
-      id:Date.now()
+      generatedRevenue:effectiveGenRev,cashCollected:effectiveCash,installments:installments,refund:effectiveRefund,
+      fathom:fathomData||null,transcript:transcript,timestamp:ts,id:Date.now()
     };
     renderResults(currentResult);
     setStatus('status','Analysis complete ✓','success');
     document.getElementById('save-status').textContent='';
   }catch(e){
     setStatus('status','Error: '+e.message,'error');
-  }finally{
-    btn.disabled=false; btn.innerHTML='▶ Analyze transcript';
   }
+  btn.disabled=false; btn.innerHTML='▶ Analyze transcript';
+}
+
+var SCORE_LABELS={call_control:'Call control',discovery_depth:'Discovery depth',belief_shifting:'Belief shifting',objection_handling:'Objection handling',pitch_effectiveness:'Pitch effectiveness',closing_strength:'Closing strength',eq_in_closing:'EQ in closing'};
+var SCORE_KEYS=['call_control','discovery_depth','belief_shifting','objection_handling','pitch_effectiveness','closing_strength','eq_in_closing'];
+var PHASE_KEYS=['opener','discovery','pitch','objection_handling','close'];
+var PHASE_LABELS={opener:'Opener',discovery:'Discovery',pitch:'Pitch',objection_handling:'Objections',close:'Close'};
+
+function renderScoreGrid(elId,scores){
+  var el=document.getElementById(elId); if(!el) return;
+  el.innerHTML=SCORE_KEYS.map(function(k){
+    var v=scores[k]||0, c=cls(v);
+    return '<div class="score-card"><div class="score-lbl">'+SCORE_LABELS[k]+'</div><div class="score-num '+c+'">'+v+'%</div><div class="bar"><div class="bar-inner '+c+'" style="width:'+v+'%"></div></div></div>';
+  }).join('');
+}
+
+function renderPhaseGrid(elId,phases,suffix){
+  var el=document.getElementById(elId); if(!el) return;
+  var total=PHASE_KEYS.reduce(function(s,k){return s+(phases[k]||0);},0);
+  el.innerHTML=PHASE_KEYS.map(function(k){
+    return '<div class="phase-card"><div class="phase-lbl">'+PHASE_LABELS[k]+'</div><div class="phase-val">'+(phases[k]||0)+'</div><div class="phase-unit">'+(suffix||'min')+'</div></div>';
+  }).join('')+'<div class="phase-card" style="border:1px solid var(--border-md)"><div class="phase-lbl">Total</div><div class="phase-val">'+total+'</div><div class="phase-unit">'+(suffix||'min')+'</div></div>';
+}
+
+function renderFeedbackBox(elId,strengths,improvements){
+  var el=document.getElementById(elId); if(!el) return;
+  var s=strengths||[], im=improvements||[];
+  el.innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">'
+    +'<div><div style="font-size:12px;font-weight:600;color:var(--success);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px">✓ Strengths</div>'
+    +s.map(function(x){return '<div style="font-size:13px;margin-bottom:6px;padding-left:8px;border-left:2px solid var(--success)">'+x+'</div>';}).join('')
+    +'</div><div><div style="font-size:12px;font-weight:600;color:var(--danger);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px">↑ Improve</div>'
+    +im.map(function(x){return '<div style="font-size:13px;margin-bottom:6px;padding-left:8px;border-left:2px solid var(--danger)">'+x+'</div>';}).join('')
+    +'</div></div>';
 }
 
 function renderResults(r){
-  const s=r.scores;
-  const labels={call_control:'Call control',discovery_depth:'Discovery depth',belief_shifting:'Belief shifting',objection_handling:'Objection handling',pitch_effectiveness:'Pitch effectiveness',closing_strength:'Closing strength',eq_in_closing:'EQ in closing'};
-  const a=avgScore(s);
-  const instCommAmt=r.cashCollected?Math.round(r.cashCollected*r.comm/100):0;
-  const remaining=r.generatedRevenue&&r.installments>1?r.generatedRevenue-r.cashCollected:0;
-
-  document.getElementById('r-overall-grid').innerHTML=`
-    <div class="stat"><div class="stat-label">Overall score</div><div class="stat-val" style="color:var(--accent)">${a}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">out of 100</div></div>
-    <div class="stat"><div class="stat-label">Cash collected</div><div class="stat-val" style="color:var(--success)">${fmtMoney(r.cashCollected)}</div></div>
-    <div class="stat"><div class="stat-label">Generated revenue</div><div class="stat-val" style="color:var(--accent)">${fmtMoney(r.generatedRevenue)}</div></div>
-    <div class="stat"><div class="stat-label">Remaining to collect</div><div class="stat-val" style="color:var(--purple)">${fmtMoney(remaining)}</div></div>
-    <div class="stat"><div class="stat-label">Installments</div><div class="stat-val">${r.installments||'—'}</div></div>
-    <div class="stat"><div class="stat-label">Commission today</div><div class="stat-val" style="color:var(--success)">${fmtMoney(instCommAmt)}</div></div>`;
-
-  document.getElementById('score-grid').innerHTML=Object.entries(labels).map(([k,label])=>{
-    const v=s[k]||0,c=cls(v);
-    return `<div class="score-card"><div class="score-lbl">${label}</div><div class="score-num ${c}">${v}%</div><div class="bar"><div class="bar-inner ${c}" style="width:${v}%"></div></div></div>`;
-  }).join('');
-
-  const p=r.phases||{};
-  const pl={opener:'Opener',discovery:'Discovery',pitch:'Pitch',objection_handling:'Objections',close:'Close'};
-  const totalMin=Object.values(p).reduce((a,b)=>a+(b||0),0);
-  document.getElementById('phase-grid').innerHTML=Object.entries(pl).map(([k,label])=>
-    `<div class="phase-card"><div class="phase-lbl">${label}</div><div class="phase-val">${p[k]||0}</div><div class="phase-unit">min</div></div>`
-  ).join('')+`<div class="phase-card" style="border:1px solid var(--border-md)"><div class="phase-lbl">Total</div><div class="phase-val">${totalMin}</div><div class="phase-unit">min</div></div>`;
-
-  // Strengths & improvements
-  const strengths=r.strengths||[];
-  const improvements=r.improvements||[];
-  document.getElementById('feedback').innerHTML=`
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div>
-        <div style="font-size:12px;font-weight:600;color:var(--success);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px">✓ Strengths</div>
-        ${strengths.map(s=>`<div style="font-size:13px;margin-bottom:6px;padding-left:8px;border-left:2px solid var(--success)">${s}</div>`).join('')}
-      </div>
-      <div>
-        <div style="font-size:12px;font-weight:600;color:var(--danger);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px">↑ Improve</div>
-        ${improvements.map(s=>`<div style="font-size:13px;margin-bottom:6px;padding-left:8px;border-left:2px solid var(--danger)">${s}</div>`).join('')}
-      </div>
-    </div>`;
+  var s=r.scores, a=avgScore(s);
+  var remaining=r.generatedRevenue&&r.installments>1?r.generatedRevenue-r.cashCollected:0;
+  var instCommAmt=r.cashCollected?Math.round(r.cashCollected*r.comm/100):0;
+  document.getElementById('r-overall-grid').innerHTML=
+    '<div class="stat"><div class="stat-label">Score</div><div class="stat-val" style="color:var(--accent)">'+a+'</div><div style="font-size:11px;color:var(--muted)">out of 100</div></div>'
+    +'<div class="stat"><div class="stat-label">Cash collected</div><div class="stat-val" style="color:var(--success)">'+fmtMoney(r.cashCollected)+'</div></div>'
+    +'<div class="stat"><div class="stat-label">Revenue generated</div><div class="stat-val">'+fmtMoney(r.generatedRevenue)+'</div></div>'
+    +'<div class="stat"><div class="stat-label">Remaining</div><div class="stat-val" style="color:var(--purple)">'+fmtMoney(remaining)+'</div></div>'
+    +'<div class="stat"><div class="stat-label">Installments</div><div class="stat-val">'+(r.installments||'—')+'</div></div>'
+    +'<div class="stat"><div class="stat-label">Commission today</div><div class="stat-val" style="color:var(--success)">'+fmtMoney(instCommAmt)+'</div></div>';
+  renderScoreGrid('score-grid',s);
+  renderPhaseGrid('phase-grid',r.phases||{});
+  renderFeedbackBox('feedback',r.strengths,r.improvements);
   document.getElementById('results').style.display='block';
 }
 
 function saveCall(){
   if(!currentResult) return;
-  const calls=loadCalls();
-  if(calls.find(c=>c.id===currentResult.id)){setStatus('save-status','Already saved.','');return;}
+  var calls=loadCalls();
+  if(calls.find(function(c){return c.id===currentResult.id;})){setStatus('save-status','Already saved.','');return;}
   calls.unshift(currentResult);
   saveCalls(calls);
   setStatus('save-status','Saved to dashboard ✓','success');
 }
 
-// PROJECT INSTALLMENTS
+// INSTALLMENT PROJECTION
 function projectInstallments(call){
-  // Returns array of {month, amount, collected}
   if(!call.generatedRevenue||!call.installments||call.installments<=0) return [];
-  const instAmt=Math.round(call.generatedRevenue/call.installments);
-  const callDate=new Date(call.timestamp);
-  const rows=[];
-  for(let i=0;i<call.installments;i++){
-    const d=new Date(callDate);
+  var instAmt=Math.round(call.generatedRevenue/call.installments);
+  var commAmt=Math.round(instAmt*(call.comm||0)/100);
+  var callDate=new Date(call.timestamp);
+  var rows=[];
+  for(var i=0;i<call.installments;i++){
+    var d=new Date(callDate);
     d.setMonth(d.getMonth()+i);
-    const commAmt=Math.round(instAmt*call.comm/100);
-    rows.push({month:monthKey(d),amount:instAmt,commission:commAmt,collected:i===0});
+    rows.push({month:monthKey(d),amount:instAmt,commission:commAmt,first:i===0});
   }
   return rows;
 }
 
 // DASHBOARD
-function getVal(id){const el=document.getElementById(id);return el?el.value:'';}
 function getFiltered(){
-  let calls=loadCalls();
-  const fa=getVal('f-account');
-  const ft=getVal('f-type');
-  const fc=getVal('f-client').toLowerCase().trim();
-  const fd1=getVal('f-date-from');
-  const fd2=getVal('f-date-to');
-  if(fa) calls=calls.filter(c=>c.account===fa);
-  if(ft) calls=calls.filter(c=>c.callType===ft);
-  if(fc) calls=calls.filter(c=>(c.client||'').toLowerCase().includes(fc)||(c.fathom?.attendees||'').toLowerCase().includes(fc));
-  if(fd1) calls=calls.filter(c=>c.timestamp>=fd1);
-  if(fd2) calls=calls.filter(c=>c.timestamp<=fd2+'T23:59:59');
+  var calls=loadCalls();
+  var fa=document.getElementById('f-account')?document.getElementById('f-account').value:'';
+  var ft=document.getElementById('f-type')?document.getElementById('f-type').value:'';
+  var fc=document.getElementById('f-client')?document.getElementById('f-client').value.toLowerCase().trim():'';
+  var fd1=document.getElementById('f-date-from')?document.getElementById('f-date-from').value:'';
+  var fd2=document.getElementById('f-date-to')?document.getElementById('f-date-to').value:'';
+  if(fa) calls=calls.filter(function(c){return c.account===fa;});
+  if(ft) calls=calls.filter(function(c){return c.callType===ft;});
+  if(fc) calls=calls.filter(function(c){return (c.client||'').toLowerCase().includes(fc);});
+  if(fd1) calls=calls.filter(function(c){return c.timestamp>=fd1;});
+  if(fd2) calls=calls.filter(function(c){return c.timestamp<=fd2+'T23:59:59';});
   return calls;
 }
 
 function renderDashboard(){
-  if(!document.getElementById('kpi-calls')) return;
-  const calls=getFiltered();
-  const pitched=calls.filter(c=>c.callType==='pitched');
-  const closed=calls.filter(c=>(c.outcome||'').toLowerCase()==='closed');
-  const now=nowMonthKey();
+  var calls=getFiltered();
+  var now=nowMonthKey();
+  var fd1=document.getElementById('f-date-from')?document.getElementById('f-date-from').value:'';
+  var fd2=document.getElementById('f-date-to')?document.getElementById('f-date-to').value:'';
+  var rangeStart=fd1?fd1.substring(0,7):now;
+  var rangeEnd=fd2?fd2.substring(0,7):now;
 
-  // Revenue KPIs — use filter date range if set, else current month
-  const filterFrom=getVal('f-date-from');
-  const filterTo=getVal('f-date-to');
-  const rangeStart=filterFrom?filterFrom.substring(0,7):now;
-  const rangeEnd=filterTo?filterTo.substring(0,7):now;
+  var closed=calls.filter(function(c){return (c.outcome||'').toLowerCase()==='closed';});
+  var taken=calls.filter(function(c){return c.callType!=='no_show';});
+  var pitchedAll=calls.filter(function(c){return c.callType==='pitched'||c.callType==='fdq';});
+  var pitchedOnly=calls.filter(function(c){return c.callType==='pitched';});
+  var fdqCalls=calls.filter(function(c){return c.callType==='fdq';});
 
-  let activeRev=0, passiveRev=0, totalGenerated=0, activeComm=0;
-  const scheduleMap={};
-
-  // Use ALL closed calls (not just filtered) for schedule, but filter display
-  loadCalls().filter(c=>(c.outcome||'').toLowerCase()==='closed').forEach(c=>{
-    totalGenerated+=(getVal('f-account')===''||c.account===getVal('f-account'))?c.generatedRevenue||0:0;
-    const rows=projectInstallments(c);
-    rows.forEach(r=>{
-      if(!scheduleMap[r.month]) scheduleMap[r.month]={active:0,passive:0,commission:0};
-      const callMonth=monthKey(new Date(c.timestamp));
-      if(r.month===callMonth){ scheduleMap[r.month].active+=r.amount; scheduleMap[r.month].commission+=r.commission; }
-      else { scheduleMap[r.month].passive+=r.amount; scheduleMap[r.month].commission+=r.commission; }
+  // Build installment schedule from all closed calls
+  var schedMap={};
+  var allClosed=loadCalls().filter(function(c){return (c.outcome||'').toLowerCase()==='closed';});
+  var fa=document.getElementById('f-account')?document.getElementById('f-account').value:'';
+  var totalGenerated=0;
+  allClosed.forEach(function(c){
+    if(fa&&c.account!==fa) return;
+    totalGenerated+=c.generatedRevenue||0;
+    projectInstallments(c).forEach(function(r){
+      if(!schedMap[r.month]) schedMap[r.month]={active:0,passive:0,commission:0};
+      var callMon=monthKey(new Date(c.timestamp));
+      if(r.month===callMon){schedMap[r.month].active+=r.amount;schedMap[r.month].commission+=r.commission;}
+      else{schedMap[r.month].passive+=r.amount;schedMap[r.month].commission+=r.commission;}
     });
   });
 
-  // Sum across selected range
-  Object.keys(scheduleMap).forEach(m=>{
+  // Cash/commission for selected period
+  var cashPeriod=0,cashPassive=0,commPeriod=0;
+  Object.keys(schedMap).forEach(function(m){
     if(m>=rangeStart&&m<=rangeEnd){
-      activeRev+=scheduleMap[m].active;
-      passiveRev+=scheduleMap[m].passive;
-      activeComm+=scheduleMap[m].commission;
+      cashPeriod+=schedMap[m].active;
+      cashPassive+=schedMap[m].passive;
+      commPeriod+=schedMap[m].commission;
     }
   });
-  // totalGenerated already filtered above
-  totalGenerated=closed.reduce((s,c)=>s+(c.generatedRevenue||0),0);
 
-  // Year to date cash collected
-  const nowYear=new Date().getFullYear().toString();
-  let ytdCash=0;
-  Object.keys(scheduleMap).forEach(m=>{
-    if(m.startsWith(nowYear)) ytdCash+=scheduleMap[m].active+scheduleMap[m].passive;
-  });
-  document.getElementById('kpi-active').textContent='$'+(activeRev).toLocaleString();
-  document.getElementById('kpi-passive').textContent='$'+(passiveRev).toLocaleString();
-  document.getElementById('kpi-total-rev').textContent='$'+(scheduleMap[now]?.commission||0).toLocaleString();
-  const kpiCommEl=document.getElementById('kpi-comm-month');
-  if(kpiCommEl) kpiCommEl.textContent='$'+activeComm.toLocaleString();
-  // Row 2: call counts
-  const calledTaken=calls.filter(c=>c.callType!=='no_show');
-  const calledPitched=calls.filter(c=>c.callType==='pitched'||c.callType==='fdq');
-  const calledFDQ=calls.filter(c=>c.callType==='fdq');
+  document.getElementById('kpi-cash-period').textContent='$'+cashPeriod.toLocaleString();
+  document.getElementById('kpi-cash-passive').textContent='$'+cashPassive.toLocaleString();
+  document.getElementById('kpi-comm-period').textContent='$'+commPeriod.toLocaleString();
+  document.getElementById('kpi-generated').textContent='$'+totalGenerated.toLocaleString();
   document.getElementById('kpi-booked').textContent=calls.length;
-  document.getElementById('kpi-taken').textContent=calledTaken.length;
-  document.getElementById('kpi-pitched').textContent=calledPitched.length;
+  document.getElementById('kpi-taken').textContent=taken.length;
+  document.getElementById('kpi-pitched-count').textContent=pitchedAll.length;
   document.getElementById('kpi-closed-count').textContent=closed.length;
-  document.getElementById('kpi-fdq-count').textContent=calledFDQ.length;
+  document.getElementById('kpi-fdq-count').textContent=fdqCalls.length;
 
-  // Avg calls per day
-  const fd1=getVal('f-date-from');
-  const fd2=getVal('f-date-to');
-  if(fd1&&fd2&&calls.length){
-    const days=Math.max(1,Math.round((new Date(fd2)-new Date(fd1))/(1000*60*60*24))+1);
-    const avgPerDay=(calledTaken.length/days).toFixed(1);
-    document.getElementById('kpi-avg-day').textContent=avgPerDay;
-    document.getElementById('kpi-avg-day-sub').textContent=`over ${days} days`;
-  } else if(calls.length) {
-    // Use range from first to last call
-    const dates=calls.map(c=>new Date(c.timestamp)).sort((a,b)=>a-b);
-    const days=Math.max(1,Math.round((dates[dates.length-1]-dates[0])/(1000*60*60*24))+1);
-    const avgPerDay=(calledTaken.length/days).toFixed(1);
-    document.getElementById('kpi-avg-day').textContent=avgPerDay;
-    document.getElementById('kpi-avg-day-sub').textContent=`over ${days} days`;
-  } else {
+  // Avg calls/day
+  if(fd1&&fd2){
+    var days=Math.max(1,Math.round((new Date(fd2)-new Date(fd1))/(86400000))+1);
+    document.getElementById('kpi-avg-day').textContent=(taken.length/days).toFixed(1);
+    document.getElementById('kpi-avg-day-sub').textContent='over '+days+' days';
+  }else if(calls.length>1){
+    var dates=calls.map(function(c){return new Date(c.timestamp);}).sort(function(a,b){return a-b;});
+    var days=Math.max(1,Math.round((dates[dates.length-1]-dates[0])/86400000)+1);
+    document.getElementById('kpi-avg-day').textContent=(taken.length/days).toFixed(1);
+    document.getElementById('kpi-avg-day-sub').textContent='over '+days+' days';
+  }else{
     document.getElementById('kpi-avg-day').textContent='—';
     document.getElementById('kpi-avg-day-sub').textContent='';
   }
-  document.getElementById('kpi-generated').textContent='$'+totalGenerated.toLocaleString();
-  // also update kpi-calls for any remaining references
-  const kpiCallsEl=document.getElementById('kpi-calls');
-  if(kpiCallsEl) kpiCallsEl.textContent=calls.length;
-  const kpiScoreEl=document.getElementById('kpi-score');
-  if(kpiScoreEl) kpiScoreEl.textContent=calls.length?Math.round(calls.reduce((s,c)=>s+avgScore(c.scores),0)/calls.length):'—';
-  const cr=(den)=>den.length?Math.round(closed.filter(c=>den.includes(c)).length/den.length*100)+'%':'—';
-  const crSub=(den,label)=>den.length?`${closed.filter(c=>den.includes(c)).length} of ${den.length} ${label}`:'';
+
+  // Close rates
+  function cr(den){return den.length?Math.round(closed.filter(function(c){return den.indexOf(c)>-1;}).length/den.length*100)+'%':'—';}
+  function crSub(den,label){return den.length?(closed.filter(function(c){return den.indexOf(c)>-1;}).length+' of '+den.length+' '+label):'';}
   document.getElementById('kpi-cr-booked').textContent=cr(calls);
   document.getElementById('kpi-cr-booked-sub').textContent=crSub(calls,'booked');
-  document.getElementById('kpi-cr-showed').textContent=cr(calledTaken);
-  document.getElementById('kpi-cr-showed-sub').textContent=crSub(calledTaken,'showed');
-  document.getElementById('kpi-cr-pitched-all').textContent=cr(calledPitched);
-  document.getElementById('kpi-cr-pitched-all-sub').textContent=crSub(calledPitched,'pitched');
-  document.getElementById('kpi-cr-pitched-excl').textContent=cr(calls.filter(c=>c.callType==='pitched'));
-  document.getElementById('kpi-cr-pitched-excl-sub').textContent=crSub(calls.filter(c=>c.callType==='pitched'),'pitched');
+  document.getElementById('kpi-cr-showed').textContent=cr(taken);
+  document.getElementById('kpi-cr-showed-sub').textContent=crSub(taken,'showed');
+  document.getElementById('kpi-cr-pitched-all').textContent=cr(pitchedAll);
+  document.getElementById('kpi-cr-pitched-all-sub').textContent=crSub(pitchedAll,'pitched');
+  document.getElementById('kpi-cr-pitched-excl').textContent=cr(pitchedOnly);
+  document.getElementById('kpi-cr-pitched-excl-sub').textContent=crSub(pitchedOnly,'pitched');
 
-  // Installment schedule
-  const schedKeys=Object.keys(scheduleMap).sort();
-  const instEl=document.getElementById('installment-section');
-  if(instEl&&schedKeys.length){
-    instEl.style.display='block';
-    document.getElementById('installment-list').innerHTML=schedKeys.map(m=>{
-      const a=scheduleMap[m].active, p=scheduleMap[m].passive, total=a+p;
-      const isPast=m<now, isCurrent=m===now;
-      const label=new Date(m+'-15').toLocaleDateString('en-GB',{month:'short',year:'numeric'});
-      return `<div class="installment-row">
-        <span class="inst-month">${label}</span>
-        <span class="inst-amount">$${total.toLocaleString()}</span>
-        <span style="font-size:12px;color:var(--success);font-weight:500">+$${scheduleMap[m].commission.toLocaleString()} comm</span>
-        ${a?`<span class="inst-badge inst-collected">Active $${a.toLocaleString()}</span>`:''}
-        ${p?`<span class="inst-badge inst-projected">Passive $${p.toLocaleString()}</span>`:''}
-        ${isCurrent?'<span style="font-size:11px;color:var(--accent);font-weight:500">← current month</span>':''}
-        ${isPast&&m!==now?'<span style="font-size:11px;color:var(--muted)">past</span>':''}
-      </div>`;
-    }).join('');
-  } else {
-    if(instEl) instEl.style.display='none';
-  }
+  // Synth section
+  document.getElementById('synth-section').style.display=calls.length?'block':'none';
 
-  // Loss analysis — avg scores on lost calls vs won
-  const lostCalls=pitched.filter(c=>(c.outcome||'').toLowerCase()==='no_close');
-  const lossEl=document.getElementById('loss-section');
-  if(lostCalls.length>=1){
-    lossEl.style.display='block';
-    const scoreKeys=['call_control','discovery_depth','belief_shifting','objection_handling','pitch_effectiveness','closing_strength','eq_in_closing'];
-    const scoreLabels={call_control:'Call control',discovery_spin:'Discovery SPIN',discovery_nepq:'Discovery NEPQ',belief_shifting:'Belief shifting',objection_handling:'Obj. handling',pitch_effectiveness:'Pitch effectiveness',closing:'Closing',eq:'EQ',ifs_awareness:'IFS awareness'};
-    // Average scores on lost calls
-    const lossAvgs=scoreKeys.map(k=>({
-      key:k,
-      label:scoreLabels[k],
-      val:Math.round(lostCalls.reduce((s,c)=>s+(c.scores[k]||0),0)/lostCalls.length)
-    })).sort((a,b)=>a.val-b.val); // weakest first
-
-    document.getElementById('loss-chart').innerHTML=lossAvgs.map(row=>`
-      <div class="loss-bar-row">
-        <span class="loss-label">${row.label}</span>
-        <div class="loss-track"><div class="loss-fill" style="width:${row.val}%;background:${row.val>=75?'#639922':row.val>=50?'#EF9F27':'#E24B4A'}"></div></div>
-        <span class="loss-val" style="color:${row.val>=75?'var(--success)':row.val>=50?'var(--warn)':'var(--danger)'}">${row.val}</span>
-      </div>`).join('');
-  } else {
-    lossEl.style.display='none';
-  }
-
-  // Aggregate scores/phases
-  const aggEl=document.getElementById('agg-section');
+  // Aggregate scores
+  var aggEl=document.getElementById('agg-section');
   if(calls.length){
     aggEl.style.display='block';
-    const scoreKeys=['call_control','discovery_depth','belief_shifting','objection_handling','pitch_effectiveness','closing_strength','eq_in_closing'];
-    const scoreLabels={call_control:'Call control',discovery_depth:'Discovery depth',belief_shifting:'Belief shifting',objection_handling:'Objection handling',pitch_effectiveness:'Pitch effectiveness',closing_strength:'Closing strength',eq_in_closing:'EQ in closing'};
-    const phaseKeys=['opener','discovery','pitch','objection_handling','close'];
-    const phaseLabels={opener:'Opener',discovery:'Discovery',pitch:'Pitch',objection_handling:'Objections',close:'Close'};
-    document.getElementById('agg-scores').innerHTML=scoreKeys.map(k=>{
-      const v=Math.round(calls.reduce((s,c)=>s+(c.scores[k]||0),0)/calls.length),c=cls(v);
-      return `<div class="score-card"><div class="score-lbl">${scoreLabels[k]}</div><div class="score-num ${c}">${v}%</div><div class="bar"><div class="bar-inner ${c}" style="width:${v}%"></div></div></div>`;
-    }).join('');
-    const phaseAvgs={};
-    phaseKeys.forEach(k=>{ phaseAvgs[k]=Math.round(calls.reduce((s,c)=>s+((c.phases&&c.phases[k])||0),0)/calls.length); });
-    const totalAvg=Object.values(phaseAvgs).reduce((a,b)=>a+b,0);
-    document.getElementById('agg-phases').innerHTML=phaseKeys.map(k=>
-      `<div class="phase-card"><div class="phase-lbl">${phaseLabels[k]}</div><div class="phase-val">${phaseAvgs[k]}</div><div class="phase-unit">min avg</div></div>`
-    ).join('')+`<div class="phase-card" style="border:1px solid var(--border-md)"><div class="phase-lbl">Total</div><div class="phase-val">${totalAvg}</div><div class="phase-unit">min avg</div></div>`;
-  } else {
+    var avgScores={};
+    SCORE_KEYS.forEach(function(k){avgScores[k]=Math.round(calls.reduce(function(s,c){return s+((c.scores&&c.scores[k])||0);},0)/calls.length);});
+    renderScoreGrid('agg-scores',avgScores);
+    var avgPhases={};
+    PHASE_KEYS.forEach(function(k){avgPhases[k]=Math.round(calls.reduce(function(s,c){return s+((c.phases&&c.phases[k])||0);},0)/calls.length);});
+    renderPhaseGrid('agg-phases',avgPhases,'min avg');
+  }else{
     aggEl.style.display='none';
   }
 
-  // Calls table
-  const list=document.getElementById('calls-list');
+  // Table
+  var list=document.getElementById('calls-list');
   if(!calls.length){list.innerHTML='<div class="empty-state">No calls match your filters.</div>';return;}
-  const badgeCls=o=>({'closed':'badge-closed','no_close':'badge-no','follow_up':'badge-follow'}[(o||'').toLowerCase()]||'badge-unknown');
-  const badgeLbl=o=>({'closed':'Closed','no_close':'No close','follow_up':'Follow up','unknown':'Unknown'}[(o||'').toLowerCase()]||'Unknown');
-  const typeBadgeCls=t=>({'pitched':'badge-pitched','not_pitched':'badge-fdq','fdq':'badge-fdq','no_show':'badge-no'}[t]||'badge-fdq');
-  const typeBadgeLbl=t=>({'pitched':'Pitched','not_pitched':'Not Pitched','fdq':'FDQ','no_show':'No Show'}[t]||t);
-  list.innerHTML=`<table class="calls-table">
-    <thead><tr><th>Date</th><th>Account</th><th>Client</th><th>Closer</th><th>Type</th><th>Score</th><th>Cash collected</th><th>Revenue</th><th>Outcome</th><th></th></tr></thead>
-    <tbody>${calls.map(c=>{
-      const a=avgScore(c.scores);
-      const date=new Date(c.timestamp).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'2-digit'});
-      const sc=a>=75?'var(--success)':a>=50?'var(--warn)':'var(--danger)';
-      const clientLabel=c.client||(c.fathom?.attendees?.split(',')[0])||'—';
-      return `<tr onclick="openModal(${c.id})">
-        <td style="color:var(--muted);white-space:nowrap">${date}</td>
-        <td style="font-weight:500">${c.account}</td>
-        <td>${clientLabel}</td>
-        <td>${c.closer}</td>
-        <td><span class="badge ${typeBadgeCls(c.callType)}">${typeBadgeLbl(c.callType)}</span></td>
-        <td><span style="font-weight:600;color:${sc}">${a}</span></td>
-        <td>${fmtMoney(c.cashCollected)}</td>
-        <td>${fmtMoney(c.generatedRevenue)}</td>
-        <td><span class="badge ${badgeCls(c.outcome)}">${badgeLbl(c.outcome)}</span></td>
-        <td>${c.fathom?.url?`<a href="${c.fathom.url}" target="_blank" onclick="event.stopPropagation()" style="font-size:11px;color:var(--accent-mid)">▶</a>`:''}</td>
-      </tr>`;
-    }).join('')}</tbody></table>`;
+  var typeLbl={pitched:'Pitched',not_pitched:'Not Pitched',fdq:'FDQ',no_show:'No Show'};
+  var typeCls={pitched:'badge-pitched',not_pitched:'badge-fdq',fdq:'badge-fdq',no_show:'badge-no'};
+  var outLbl={closed:'Closed',no_close:'No close',follow_up:'Follow up',unknown:'Unknown'};
+  var outCls={closed:'badge-closed',no_close:'badge-no',follow_up:'badge-follow',unknown:'badge-unknown'};
+  list.innerHTML='<table class="calls-table"><thead><tr><th>Date</th><th>Account</th><th>Client</th><th>Closer</th><th>Type</th><th>Score</th><th>Cash</th><th>Revenue</th><th>Outcome</th><th></th></tr></thead><tbody>'
+    +calls.map(function(c){
+      var a=avgScore(c.scores);
+      var sc=a>=75?'var(--success)':a>=50?'var(--warn)':'var(--danger)';
+      var dt=new Date(c.timestamp).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'2-digit'});
+      var ot=(c.outcome||'unknown').toLowerCase();
+      var ct=c.callType||'pitched';
+      return '<tr onclick="openModal('+c.id+')">'
+        +'<td style="color:var(--muted);white-space:nowrap">'+dt+'</td>'
+        +'<td style="font-weight:500">'+c.account+'</td>'
+        +'<td>'+(c.client||'—')+'</td>'
+        +'<td>'+c.closer+'</td>'
+        +'<td><span class="badge '+(typeCls[ct]||'badge-fdq')+'">'+(typeLbl[ct]||ct)+'</span></td>'
+        +'<td><span style="font-weight:600;color:'+sc+'">'+a+'</span></td>'
+        +'<td>'+fmtMoney(c.cashCollected)+'</td>'
+        +'<td>'+fmtMoney(c.generatedRevenue)+'</td>'
+        +'<td><span class="badge '+(outCls[ot]||'badge-unknown')+'">'+(outLbl[ot]||ot)+'</span></td>'
+        +'<td>'+(c.fathom&&c.fathom.url?'<a href="'+c.fathom.url+'" target="_blank" onclick="event.stopPropagation()" style="font-size:11px;color:var(--accent-mid)">▶</a>':'')+'</td>'
+        +'</tr>';
+    }).join('')+'</tbody></table>';
+
+  // Installment schedule
+  var schedKeys=Object.keys(schedMap).sort();
+  var instEl=document.getElementById('installment-section');
+  if(schedKeys.length){
+    instEl.style.display='block';
+    document.getElementById('installment-list').innerHTML=schedKeys.map(function(m){
+      var a=schedMap[m].active,p=schedMap[m].passive,total=a+p;
+      var lbl=new Date(m+'-15').toLocaleDateString('en-GB',{month:'short',year:'numeric'});
+      var isCur=m===now;
+      return '<div class="installment-row">'
+        +'<span class="inst-month">'+lbl+'</span>'
+        +'<span class="inst-amount">$'+total.toLocaleString()+'</span>'
+        +'<span style="font-size:12px;color:var(--success);font-weight:500">+$'+schedMap[m].commission.toLocaleString()+' comm</span>'
+        +(a?'<span class="inst-badge inst-collected">Active $'+a.toLocaleString()+'</span>':'')
+        +(p?'<span class="inst-badge inst-projected">Passive $'+p.toLocaleString()+'</span>':'')
+        +(isCur?'<span style="font-size:11px;color:var(--accent);font-weight:500">← now</span>':'')
+        +'</div>';
+    }).join('');
+  }else{
+    instEl.style.display='none';
+  }
 }
 
 function resetFilters(){
-  ['f-account','f-type','f-client','f-date-from','f-date-to'].forEach(id=>document.getElementById(id).value='');
+  ['f-account','f-type','f-client','f-date-from','f-date-to'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
   renderDashboard();
 }
 
+// MODAL
 function openModal(id){
-  const c=loadCalls().find(x=>x.id===id);
+  var c=loadCalls().find(function(x){return x.id===id;});
   if(!c) return;
   openCallId=id;
-  const date=new Date(c.timestamp).toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'});
-  const clientLabel=c.client||c.fathom?.attendees||'Unknown';
-  document.getElementById('m-title').textContent=clientLabel+' — '+c.account;
-  document.getElementById('m-meta').textContent=`${date} · ${c.closer} · ${{pitched:'Pitched',not_pitched:'Not Pitched',fdq:'FDQ',no_show:'No Show'}[c.callType]||c.callType}`;
-
-  const fathomEl=document.getElementById('m-fathom');
-  if(c.fathom?.url){
-    fathomEl.innerHTML=`<a href="${c.fathom.url}" target="_blank">▶ Watch Fathom recording</a>${c.fathom.attendees?' · '+c.fathom.attendees:''}${c.fathom.title?' · "'+c.fathom.title+'"':''}`;
-    fathomEl.style.display='block';
-  }else fathomEl.style.display='none';
-
-  const s=c.scores,a=avgScore(s);
-  const remaining=c.generatedRevenue&&c.installments>1?c.generatedRevenue-c.cashCollected:0;
-  const commAmt=c.generatedRevenue?Math.round(c.generatedRevenue*c.comm/100):0;
-  document.getElementById('m-overall').innerHTML=`
-    <div class="stat"><div class="stat-label">Score</div><div class="stat-val" style="color:var(--accent)">${a}</div></div>
-    <div class="stat"><div class="stat-label">Cash collected</div><div class="stat-val" style="color:var(--success)">${fmtMoney(c.cashCollected)}</div></div>
-    <div class="stat"><div class="stat-label">Generated revenue</div><div class="stat-val">${fmtMoney(c.generatedRevenue)}</div></div>
-    <div class="stat"><div class="stat-label">Remaining</div><div class="stat-val" style="color:var(--purple)">${fmtMoney(remaining)}</div></div>
-    <div class="stat"><div class="stat-label">Installments</div><div class="stat-val">${c.installments||'—'}</div></div>
-    <div class="stat"><div class="stat-label">Commission</div><div class="stat-val" style="color:var(--success)">${fmtMoney(commAmt)}</div></div>`;
-
-  const labels={call_control:'Call control',discovery_depth:'Discovery depth',belief_shifting:'Belief shifting',objection_handling:'Objection handling',pitch_effectiveness:'Pitch effectiveness',closing_strength:'Closing strength',eq_in_closing:'EQ in closing'};
-  document.getElementById('m-scores').innerHTML=Object.entries(labels).map(([k,label])=>{
-    const v=s[k]||0,cl=cls(v);
-    return `<div class="score-card"><div class="score-lbl">${label}</div><div class="score-num ${cl}">${v}%</div><div class="bar"><div class="bar-inner ${cl}" style="width:${v}%"></div></div></div>`;
-  }).join('');
-
-  const p=c.phases||{};
-  const pl={opener:'Opener',discovery:'Discovery',pitch:'Pitch',objection_handling:'Objections',close:'Close'};
-  document.getElementById('m-phases').innerHTML=Object.entries(pl).map(([k,label])=>
-    `<div class="phase-card"><div class="phase-lbl">${label}</div><div class="phase-val">${p[k]||0}</div><div class="phase-unit">min</div></div>`
-  ).join('');
-
-  const mstrengths=c.strengths||[];
-  const mimprovements=c.improvements||[];
-  document.getElementById('m-feedback').innerHTML=`
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div>
-        <div style="font-size:12px;font-weight:600;color:var(--success);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px">✓ Strengths</div>
-        ${mstrengths.map(s=>`<div style="font-size:13px;margin-bottom:6px;padding-left:8px;border-left:2px solid var(--success)">${s}</div>`).join('')||'<div style="font-size:13px;color:var(--muted)">None stored</div>'}
-      </div>
-      <div>
-        <div style="font-size:12px;font-weight:600;color:var(--danger);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px">↑ Improve</div>
-        ${mimprovements.map(s=>`<div style="font-size:13px;margin-bottom:6px;padding-left:8px;border-left:2px solid var(--danger)">${s}</div>`).join('')||'<div style="font-size:13px;color:var(--muted)">None stored</div>'}
-      </div>
-    </div>`;
+  var dt=new Date(c.timestamp).toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'});
+  document.getElementById('m-title').textContent=(c.client||'Unknown')+' — '+c.account;
+  document.getElementById('m-meta').textContent=dt+' · '+c.closer+' · '+({pitched:'Pitched',not_pitched:'Not Pitched',fdq:'FDQ',no_show:'No Show'}[c.callType]||c.callType);
+  var fEl=document.getElementById('m-fathom');
+  if(c.fathom&&c.fathom.url){fEl.innerHTML='<a href="'+c.fathom.url+'" target="_blank">▶ Watch recording</a>'+(c.fathom.attendees?' · '+c.fathom.attendees:'');fEl.style.display='block';}
+  else fEl.style.display='none';
+  var a=avgScore(c.scores);
+  var remaining=c.generatedRevenue&&c.installments>1?c.generatedRevenue-c.cashCollected:0;
+  document.getElementById('m-overall').innerHTML=
+    '<div class="stat"><div class="stat-label">Score</div><div class="stat-val" style="color:var(--accent)">'+a+'</div></div>'
+    +'<div class="stat"><div class="stat-label">Cash collected</div><div class="stat-val" style="color:var(--success)">'+fmtMoney(c.cashCollected)+'</div></div>'
+    +'<div class="stat"><div class="stat-label">Revenue generated</div><div class="stat-val">'+fmtMoney(c.generatedRevenue)+'</div></div>'
+    +'<div class="stat"><div class="stat-label">Remaining</div><div class="stat-val" style="color:var(--purple)">'+fmtMoney(remaining)+'</div></div>'
+    +'<div class="stat"><div class="stat-label">Installments</div><div class="stat-val">'+(c.installments||'—')+'</div></div>'
+    +'<div class="stat"><div class="stat-label">Commission</div><div class="stat-val" style="color:var(--success)">'+fmtMoney(c.cashCollected?Math.round(c.cashCollected*c.comm/100):0)+'</div></div>';
+  renderScoreGrid('m-scores',c.scores||{});
+  renderPhaseGrid('m-phases',c.phases||{});
+  renderFeedbackBox('m-feedback',c.strengths,c.improvements);
   // Pre-fill update fields
-  const outcomeEl=document.getElementById('m-outcome');
-  const outcomeVal=(c.outcome||'unknown').toLowerCase();
-  Array.from(outcomeEl.options).forEach(o=>o.selected=o.value===outcomeVal);
+  var ot=(c.outcome||'unknown').toLowerCase();
+  var mout=document.getElementById('m-outcome');
+  for(var i=0;i<mout.options.length;i++) mout.options[i].selected=mout.options[i].value===ot;
   document.getElementById('m-call-date').value=c.timestamp?c.timestamp.substring(0,10):'';
   document.getElementById('m-date-closed').value=c.dateClosed||'';
   document.getElementById('m-cash').value=c.cashCollected||'';
   document.getElementById('m-revenue').value=c.generatedRevenue||'';
   document.getElementById('m-installments').value=c.installments||'';
-  document.getElementById('m-refund-input').value=c.refund||'';
-  document.getElementById('m-refund-status').textContent='';
+  document.getElementById('m-refund').value=c.refund||'';
+  document.getElementById('m-status').textContent='';
   document.getElementById('modal').classList.add('open');
 }
 
-function updateCall(){
-  const calls=loadCalls();
-  const c=calls.find(x=>x.id===openCallId);
-  if(!c) return;
-  const newOutcome=document.getElementById('m-outcome').value;
-  const newCallDate=document.getElementById('m-call-date').value;
-  const dateClosed=document.getElementById('m-date-closed').value;
-  const newCash=parseFloat(document.getElementById('m-cash').value)||0;
-  const newRevenue=parseFloat(document.getElementById('m-revenue').value)||0;
-  const newInstallments=parseInt(document.getElementById('m-installments').value)||1;
-  const refundAmt=parseFloat(document.getElementById('m-refund-input').value)||0;
+function closeModalOverlay(e){if(e.target.id==='modal') document.getElementById('modal').classList.remove('open');}
 
+function updateCall(){
+  var calls=loadCalls();
+  var c=calls.find(function(x){return x.id===openCallId;});
+  if(!c) return;
+  var newOutcome=document.getElementById('m-outcome').value;
+  var newCallDate=document.getElementById('m-call-date').value;
+  var dateClosed=document.getElementById('m-date-closed').value;
+  var newCash=parseFloat(document.getElementById('m-cash').value)||0;
+  var newRevenue=parseFloat(document.getElementById('m-revenue').value)||0;
+  var newInst=parseInt(document.getElementById('m-installments').value)||1;
+  var refundAmt=parseFloat(document.getElementById('m-refund').value)||0;
   c.outcome=newOutcome;
   if(newCallDate) c.timestamp=newCallDate+'T12:00:00.000Z';
-  if(dateClosed) {
-    c.dateClosed=dateClosed;
-    if(newOutcome==='closed'&&!newCallDate) c.timestamp=dateClosed+'T12:00:00.000Z';
-  }
-  const effectiveRefund=Math.min(refundAmt, newRevenue);
-  c.generatedRevenue=newRevenue-effectiveRefund;
-  c.cashCollected=effectiveRefund>=newRevenue?0:newCash;
-  c.installments=newInstallments;
-  c.refund=effectiveRefund;
-
+  if(dateClosed){c.dateClosed=dateClosed;if(newOutcome==='closed'&&!newCallDate) c.timestamp=dateClosed+'T12:00:00.000Z';}
+  var effRefund=Math.min(refundAmt,newRevenue);
+  c.generatedRevenue=newRevenue-effRefund;
+  c.cashCollected=effRefund>=newRevenue?0:newCash;
+  c.installments=newInst;
+  c.refund=effRefund;
   saveCalls(calls);
-  setStatus('m-refund-status','Updated ✓','success');
-  // Refresh modal stats
-  const remaining=c.generatedRevenue&&c.installments>1?c.generatedRevenue-c.cashCollected:0;
-  const commAmt=c.cashCollected?Math.round(c.cashCollected*c.comm/100):0;
-  document.getElementById('m-overall').innerHTML=`
-    <div class="stat"><div class="stat-label">Score</div><div class="stat-val" style="color:var(--accent)">${avgScore(c.scores)}</div></div>
-    <div class="stat"><div class="stat-label">Cash collected</div><div class="stat-val" style="color:var(--success)">${fmtMoney(c.cashCollected)}</div></div>
-    <div class="stat"><div class="stat-label">Generated revenue</div><div class="stat-val">${fmtMoney(c.generatedRevenue)}</div></div>
-    <div class="stat"><div class="stat-label">Remaining</div><div class="stat-val" style="color:var(--purple)">${fmtMoney(remaining)}</div></div>
-    <div class="stat"><div class="stat-label">Installments</div><div class="stat-val">${c.installments||'—'}</div></div>
-    <div class="stat"><div class="stat-label">Commission</div><div class="stat-val" style="color:var(--success)">${fmtMoney(commAmt)}</div></div>`;
+  setStatus('m-status','Updated ✓','success');
   renderDashboard();
 }
 
-function closeModal(e){if(e.target.id==='modal') document.getElementById('modal').classList.remove('open');}
-
 function deleteCall(){
   if(!openCallId||!confirm('Delete this call?')) return;
-  saveCalls(loadCalls().filter(c=>c.id!==openCallId));
+  saveCalls(loadCalls().filter(function(c){return c.id!==openCallId;}));
   document.getElementById('modal').classList.remove('open');
   renderDashboard();
 }
 
+// SYNTHESIZE FEEDBACK
+async function synthesizeFeedback(){
+  var apiKey=document.getElementById('api-key').value.trim();
+  if(!apiKey){alert('Enter your API key in the Analyze tab first.');return;}
+  var calls=getFiltered();
+  if(!calls.length) return;
+  var btn=document.getElementById('btn-synth');
+  btn.disabled=true; btn.textContent='...';
+  document.getElementById('synth-content').textContent='Analyzing...';
+  var allS=calls.map(function(c){return (c.strengths||[]).join('; ');}).join('\n');
+  var allI=calls.map(function(c){return (c.improvements||[]).join('; ');}).join('\n');
+  try{
+    var resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:500,
+        system:'Sales coach. Given strengths and improvements from multiple calls, return ONLY valid JSON: {"strengths":["...","...","..."],"improvements":["...","...","..."]}',
+        messages:[{role:'user',content:calls.length+' calls.\nStrengths:\n'+allS+'\nImprovements:\n'+allI}]
+      })
+    });
+    var data=await resp.json();
+    if(data.error) throw new Error(data.error.message);
+    var text=data.content.map(function(b){return b.text||'';}).join('');
+    var s=text.indexOf('{'),e=text.lastIndexOf('}');
+    var parsed=JSON.parse(text.substring(s,e+1));
+    renderFeedbackBox('synth-content',parsed.strengths,parsed.improvements);
+  }catch(err){
+    document.getElementById('synth-content').textContent='Error: '+err.message;
+  }
+  btn.disabled=false; btn.textContent='Generate insights';
+}
+
+// EXPORT / IMPORT
 function exportData(){
-  const calls=loadCalls();
-  const blob=new Blob([JSON.stringify(calls,null,2)],{type:'application/json'});
-  const a=document.createElement('a');
+  var calls=loadCalls();
+  var blob=new Blob([JSON.stringify(calls,null,2)],{type:'application/json'});
+  var a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
   a.download='sales-calls-'+new Date().toISOString().substring(0,10)+'.json';
   a.click();
 }
+
 async function importData(e){
-  const file=e.target.files[0];
+  var file=e.target.files[0];
   if(!file) return;
-  const reader=new FileReader();
+  document.getElementById('import-input').value='';
+  var reader=new FileReader();
   reader.onload=async function(ev){
+    var imported,merged;
     try{
-      const imported=JSON.parse(ev.target.result);
+      imported=JSON.parse(ev.target.result);
       if(!Array.isArray(imported)) throw new Error('Invalid format');
-      const existing=loadCalls();
-      const existingIds=new Set(existing.map(c=>c.id));
-      const merged=[...existing,...imported.filter(c=>!existingIds.has(c.id))];
-      merged.sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
+      var existing=loadCalls();
+      var existingIds=new Set(existing.map(function(c){return c.id;}));
+      merged=[...existing,...imported.filter(function(c){return !existingIds.has(c.id);})];
+      merged.sort(function(a,b){return new Date(b.timestamp)-new Date(a.timestamp);});
       saveCalls(merged);
-      renderDashboard();
-
-      const needsBackfill=merged.filter(c=>!c.strengths||!c.strengths.length);
-      if(!needsBackfill.length){
-        alert('Imported '+imported.length+' calls ('+merged.length+' total). All up to date.');
-        return;
-      }
-      const apiKey=document.getElementById('api-key').value.trim();
-      if(!apiKey){
-        alert('Imported '+imported.length+' calls. '+needsBackfill.length+' need backfill — enter API key in Analyze tab and re-import.');
-        return;
-      }
-      const confirmed=confirm('Imported '+imported.length+' calls. '+needsBackfill.length+' missing strengths/improvements. Backfill now?');
-      if(!confirmed) return;
-
-      let prog=document.getElementById('import-progress');
-      if(!prog){
-        prog=document.createElement('div');
-        prog.id='import-progress';
-        prog.style.cssText='position:fixed;bottom:20px;right:20px;background:#185FA5;color:#fff;padding:12px 18px;border-radius:12px;font-size:13px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2)';
-        document.body.appendChild(prog);
-      }
-
-      let done=0;
-      for(const c of needsBackfill){
-        prog.textContent='Backfilling '+done+'/'+needsBackfill.length+'...';
-        try{
-          const source=c.transcript?
-            'Transcript:
-'+c.transcript.substring(0,3000):
-            'Feedback:
-'+(c.feedback||'')+'
-Scores: '+JSON.stringify(c.scores||{});
-          const resp=await fetch('https://api.anthropic.com/v1/messages',{
-            method:'POST',
-            headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-            body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:400,
-              system:'You are a sales coach. Return ONLY valid JSON: {"strengths":["...","...","..."],"improvements":["...","...","..."]} — 3 specific strengths and 3 specific improvements from this call.',
-              messages:[{role:'user',content:source}]
-            })
-          });
-          const data=await resp.json();
-          if(!data.error){
-            const text=data.content.map(function(b){return b.text||'';}).join('');
-            const clean=text.replace(/```json|```/g,'').trim();
-            const start=clean.indexOf('{');
-            const end=clean.lastIndexOf('}');
-            if(start>-1&&end>-1){
-              const parsed=JSON.parse(clean.substring(start,end+1));
-              c.strengths=parsed.strengths||[];
-              c.improvements=parsed.improvements||[];
-            }
+    }catch(err){
+      alert('Import failed: '+err.message);
+      return;
+    }
+    var needsBackfill=merged.filter(function(c){return !c.strengths||!c.strengths.length;});
+    if(!needsBackfill.length){
+      alert('Imported '+imported.length+' calls. All up to date.');
+      return;
+    }
+    var apiKey=document.getElementById('api-key').value.trim();
+    if(!apiKey){
+      alert('Imported '+imported.length+' calls. '+needsBackfill.length+' need backfill — enter API key and re-import.');
+      return;
+    }
+    if(!confirm('Imported '+imported.length+' calls. '+needsBackfill.length+' need backfill. Run now?')) return;
+    var prog=document.createElement('div');
+    prog.style.cssText='position:fixed;bottom:20px;right:20px;background:#185FA5;color:#fff;padding:12px 18px;border-radius:12px;font-size:13px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2)';
+    document.body.appendChild(prog);
+    var done=0;
+    for(var i=0;i<needsBackfill.length;i++){
+      var c=needsBackfill[i];
+      prog.textContent='Backfilling '+(done+1)+'/'+needsBackfill.length+'...';
+      try{
+        var src=c.transcript?'Transcript:\n'+c.transcript.substring(0,3000):'Feedback:\n'+(c.feedback||'')+'\nScores:'+JSON.stringify(c.scores||{});
+        var resp=await fetch('https://api.anthropic.com/v1/messages',{
+          method:'POST',
+          headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+          body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:400,
+            system:'Sales coach. Return ONLY valid JSON: {"strengths":["...","...","..."],"improvements":["...","...","..."]}',
+            messages:[{role:'user',content:src}]
+          })
+        });
+        var data=await resp.json();
+        if(!data.error){
+          var text=data.content.map(function(b){return b.text||'';}).join('');
+          var s=text.indexOf('{'),en=text.lastIndexOf('}');
+          if(s>-1&&en>-1){
+            var p=JSON.parse(text.substring(s,en+1));
+            c.strengths=p.strengths||[];
+            c.improvements=p.improvements||[];
           }
-        }catch(err){console.warn('Backfill error',c.id,err);}
-        done++;
-        saveCalls(merged);
-      }
-      prog.textContent='Done! '+done+' calls backfilled.';
-      setTimeout(function(){if(prog&&prog.parentNode)prog.parentNode.removeChild(prog);},3000);
-      renderDashboard();
-    }catch(err){alert('Import failed: '+err.message);}
+        }
+      }catch(err){console.warn('Backfill failed',c.id,err);}
+      done++;
+      saveCalls(merged);
+    }
+    prog.textContent='Done! '+done+' calls backfilled.';
+    setTimeout(function(){if(prog.parentNode)prog.parentNode.removeChild(prog);},3000);
   };
   reader.readAsText(file);
-  e.target.value='';
-}
-async function synthesizeFeedback(){
-  const apiKey=document.getElementById('api-key').value.trim();
-  if(!apiKey){alert('Enter your Anthropic API key in the Analyze tab first.');return;}
-  const calls=getFiltered();
-  if(!calls.length) return;
-  const btn=document.getElementById('btn-synth');
-  btn.disabled=true; btn.innerHTML='<span class="spinner spinner-sm"></span>';
-  document.getElementById('synth-content').innerHTML='<span style="color:var(--muted)">Analyzing...</span>';
-
-  // Compile all stored strengths/improvements + feedback
-  const allStrengths=calls.flatMap(c=>c.strengths||[]);
-  const allImprovements=calls.flatMap(c=>c.improvements||[]);
-  const summary=`${calls.length} calls analyzed.
-
-Stored strengths:
-${allStrengths.join('\n')}
-
-Stored improvements:
-${allImprovements.join('\n')}`;
-
-  try{
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:600,
-        system:'You are an expert sales coach. Given a summary of strengths and areas for improvement across multiple sales calls, synthesize the top 3 recurring strengths and top 3 most important improvements. Return ONLY valid JSON: {"strengths":["...","...","..."],"improvements":["...","...","..."]}',
-        messages:[{role:'user',content:summary}]
-      })
-    });
-    const data=await resp.json();
-    if(data.error) throw new Error(data.error.message);
-    const text=data.content.map(b=>b.text||'').join('');
-    const parsed=JSON.parse(text.replace(/```json|```/g,'').trim().match(/\{[\s\S]*\}/)[0]);
-    const s=parsed.strengths||[], im=parsed.improvements||[];
-    document.getElementById('synth-content').innerHTML=`
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-        <div>
-          <div style="font-size:12px;font-weight:600;color:var(--success);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px">✓ Top strengths</div>
-          ${s.map(x=>`<div style="font-size:13px;margin-bottom:8px;padding-left:8px;border-left:2px solid var(--success)">${x}</div>`).join('')}
-        </div>
-        <div>
-          <div style="font-size:12px;font-weight:600;color:var(--danger);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px">↑ Top improvements</div>
-          ${im.map(x=>`<div style="font-size:13px;margin-bottom:8px;padding-left:8px;border-left:2px solid var(--danger)">${x}</div>`).join('')}
-        </div>
-      </div>`;
-  }catch(e){
-    document.getElementById('synth-content').innerHTML=`<span style="color:var(--danger)">Error: ${e.message}</span>`;
-  }finally{
-    btn.disabled=false; btn.innerHTML='Generate insights';
-  }
 }
 
 function clearAll(){
-  if(confirm('Delete all saved calls?')){localStorage.removeItem(STORAGE_KEY);renderDashboard();}
+  if(confirm('Delete all saved calls?')){localStorage.removeItem(STORAGE_KEY);}
 }
 </script>
 </body>
