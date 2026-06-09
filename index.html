@@ -435,7 +435,7 @@ function saveCalls(c){localStorage.setItem(STORAGE_KEY,JSON.stringify(c));}
 // HELPERS
 function cls(v){return v>=7.5?'hi':v>=5?'md':'lo';}
 function setStatus(id,msg,type){var el=document.getElementById(id);if(!el)return;el.textContent=msg;el.className='status'+(type?' '+type:'');}
-function avgScore(s){if(!s)return 0;var vals=Object.values(s).filter(function(v){return typeof v==='number';});return vals.length?Math.round(vals.reduce(function(a,b){return a+b;},0)/vals.length):0;}
+function avgScore(s){if(!s)return 0;var vals=Object.values(s).filter(function(v){return typeof v==='number';});return vals.length?Math.round(vals.reduce(function(a,b){return a+b;},0)*10)/10:0;}
 function fmtMoney(n){return n?'$'+Math.round(n).toLocaleString():'—';}
 function monthKey(d){return d.toISOString().substring(0,7);}
 function nowMonthKey(){return monthKey(new Date());}
@@ -532,7 +532,7 @@ function renderResults(r){
   var remaining=r.generatedRevenue&&r.installments>1?r.generatedRevenue-r.cashCollected:0;
   var instCommAmt=r.cashCollected?Math.round(r.cashCollected*r.comm/100):0;
   document.getElementById('r-overall-grid').innerHTML=
-    '<div class="stat"><div class="stat-label">Score</div><div class="stat-val" style="color:var(--accent)">'+a+'</div><div style="font-size:11px;color:var(--muted)">out of 10 avg</div></div>'
+    '<div class="stat"><div class="stat-label">Total score</div><div class="stat-val" style="color:var(--accent)">'+a+' / 70</div></div>'
     +'<div class="stat"><div class="stat-label">Cash collected</div><div class="stat-val" style="color:var(--success)">'+fmtMoney(r.cashCollected)+'</div></div>'
     +'<div class="stat"><div class="stat-label">Revenue generated</div><div class="stat-val">'+fmtMoney(r.generatedRevenue)+'</div></div>'
     +'<div class="stat"><div class="stat-label">Remaining</div><div class="stat-val" style="color:var(--purple)">'+fmtMoney(remaining)+'</div></div>'
@@ -682,7 +682,7 @@ function renderDashboard(){
   if(calls.length){
     aggEl.style.display='block';
     var avgScores={};
-    SCORE_KEYS.forEach(function(k){avgScores[k]=Math.round(calls.reduce(function(s,c){return s+((c.scores&&c.scores[k])||0);},0)/calls.length);});
+    SCORE_KEYS.forEach(function(k){avgScores[k]=Math.round(calls.reduce(function(s,c){return s+((c.scores&&c.scores[k])||0);},0)/calls.length*10)/10;});
     renderScoreGrid('agg-scores',avgScores);
     var avgPhases={};
     PHASE_KEYS.forEach(function(k){avgPhases[k]=Math.round(calls.reduce(function(s,c){return s+((c.phases&&c.phases[k])||0);},0)/calls.length);});
@@ -701,7 +701,7 @@ function renderDashboard(){
   list.innerHTML='<table class="calls-table"><thead><tr><th>Date</th><th>Account</th><th>Client</th><th>Closer</th><th>Type</th><th>Score</th><th>Cash</th><th>Revenue</th><th>Outcome</th><th></th></tr></thead><tbody>'
     +calls.map(function(c){
       var a=avgScore(c.scores);
-      var sc=a>=75?'var(--success)':a>=50?'var(--warn)':'var(--danger)';
+      var sc=a>=52?'var(--success)':a>=35?'var(--warn)':'var(--danger)';
       var dt=new Date(c.timestamp).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'2-digit'});
       var ot=(c.outcome||'unknown').toLowerCase();
       var ct=c.callType||'pitched';
@@ -711,7 +711,7 @@ function renderDashboard(){
         +'<td>'+(c.client||'—')+'</td>'
         +'<td>'+c.closer+'</td>'
         +'<td><span class="badge '+(typeCls[ct]||'badge-fdq')+'">'+(typeLbl[ct]||ct)+'</span></td>'
-        +'<td><span style="font-weight:600;color:'+sc+'">'+a+'</span></td>'
+        +'<td><span style="font-weight:600;color:'+sc+'">'+a+'/70</span></td>'
         +'<td>'+fmtMoney(c.cashCollected)+'</td>'
         +'<td>'+fmtMoney(c.generatedRevenue)+'</td>'
         +'<td><span class="badge '+(outCls[ot]||'badge-unknown')+'">'+(outLbl[ot]||ot)+'</span></td>'
@@ -761,7 +761,7 @@ function openModal(id){
   var a=avgScore(c.scores);
   var remaining=c.generatedRevenue&&c.installments>1?c.generatedRevenue-c.cashCollected:0;
   document.getElementById('m-overall').innerHTML=
-    '<div class="stat"><div class="stat-label">Score</div><div class="stat-val" style="color:var(--accent)">'+a+'</div><div style="font-size:11px;color:var(--muted)">out of 10 avg</div></div>'
+    '<div class="stat"><div class="stat-label">Total score</div><div class="stat-val" style="color:var(--accent)">'+a+' / 70</div></div>'
     +'<div class="stat"><div class="stat-label">Cash collected</div><div class="stat-val" style="color:var(--success)">'+fmtMoney(c.cashCollected)+'</div></div>'
     +'<div class="stat"><div class="stat-label">Revenue generated</div><div class="stat-val">'+fmtMoney(c.generatedRevenue)+'</div></div>'
     +'<div class="stat"><div class="stat-label">Remaining</div><div class="stat-val" style="color:var(--purple)">'+fmtMoney(remaining)+'</div></div>'
