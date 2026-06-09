@@ -429,6 +429,9 @@ let account='AlwaysCoach', comm=10, callType='pitched', currentResult=null, open
 document.addEventListener('DOMContentLoaded',()=>{
   const d=document.getElementById('call-date');
   if(d) d.value=new Date().toISOString().substring(0,10);
+  // Clean up any stuck progress div
+  const stuck=document.getElementById('import-progress');
+  if(stuck&&stuck.parentNode) stuck.parentNode.removeChild(stuck);
 });
 
 function showPage(id,btn){
