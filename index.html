@@ -540,7 +540,7 @@ function renderResults(r){
   var remaining=r.generatedRevenue&&r.installments>1?r.generatedRevenue-r.cashCollected:0;
   var instCommAmt=r.cashCollected?Math.round(r.cashCollected*r.comm/100):0;
   document.getElementById('r-overall-grid').innerHTML=
-    '<div class="stat"><div class="stat-label">Total score</div><div class="stat-val" style="color:var(--accent)">'+a+' / 70</div></div>'
+    '<div class="stat"><div class="stat-label">Total score</div><div class="stat-val" style="color:var(--accent)">'+a+' / 60</div></div>'
     +'<div class="stat"><div class="stat-label">Cash collected</div><div class="stat-val" style="color:var(--success)">'+fmtMoney(r.cashCollected)+'</div></div>'
     +'<div class="stat"><div class="stat-label">Revenue generated</div><div class="stat-val">'+fmtMoney(r.generatedRevenue)+'</div></div>'
     +'<div class="stat"><div class="stat-label">Remaining</div><div class="stat-val" style="color:var(--purple)">'+fmtMoney(remaining)+'</div></div>'
@@ -720,7 +720,7 @@ function renderDashboard(){
         +'<td>'+(c.client||'—')+'</td>'
         +'<td>'+c.closer+'</td>'
         +'<td><span class="badge '+(typeCls[ct]||'badge-fdq')+'">'+(typeLbl[ct]||ct)+'</span></td>'
-        +'<td><span style="font-weight:600;color:'+sc+'">'+a+'/70</span></td>'
+        +'<td><span style="font-weight:600;color:'+sc+'">'+a+'/60</span></td>'
         +'<td>'+fmtMoney(c.cashCollected)+'</td>'
         +'<td>'+fmtMoney(c.generatedRevenue)+'</td>'
         +'<td><span class="badge '+(outCls[ot]||'badge-unknown')+'">'+(outLbl[ot]||ot)+'</span></td>'
@@ -770,7 +770,7 @@ function openModal(id){
   var a=avgScore(c.scores);
   var remaining=c.generatedRevenue&&c.installments>1?c.generatedRevenue-c.cashCollected:0;
   document.getElementById('m-overall').innerHTML=
-    '<div class="stat"><div class="stat-label">Total score</div><div class="stat-val" style="color:var(--accent)">'+a+' / 70</div></div>'
+    '<div class="stat"><div class="stat-label">Total score</div><div class="stat-val" style="color:var(--accent)">'+a+' / 60</div></div>'
     +'<div class="stat"><div class="stat-label">Cash collected</div><div class="stat-val" style="color:var(--success)">'+fmtMoney(c.cashCollected)+'</div></div>'
     +'<div class="stat"><div class="stat-label">Revenue generated</div><div class="stat-val">'+fmtMoney(c.generatedRevenue)+'</div></div>'
     +'<div class="stat"><div class="stat-label">Remaining</div><div class="stat-val" style="color:var(--purple)">'+fmtMoney(remaining)+'</div></div>'
