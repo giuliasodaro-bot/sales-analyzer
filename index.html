@@ -341,10 +341,11 @@ const STORAGE_KEY = 'sales_calls';
         if(d.length){localStorage.setItem(STORAGE_KEY,JSON.stringify(d));current=d;break;}
       }
     }
-    // Migrate old score keys to new ones
+    // Always migrate old score keys to new ones
     var scoreMap={discovery_spin:'discovery_depth',discovery_nepq:'discovery_depth',closing:'closing_strength',eq:'eq_in_closing',ifs_awareness:null};
+    var calls=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
     var changed=false;
-    current.forEach(function(c){
+    calls.forEach(function(c){
       if(!c.scores) return;
       Object.keys(scoreMap).forEach(function(oldKey){
         if(c.scores[oldKey]!==undefined){
@@ -355,7 +356,7 @@ const STORAGE_KEY = 'sales_calls';
         }
       });
     });
-    if(changed) localStorage.setItem(STORAGE_KEY,JSON.stringify(current));
+    if(changed) localStorage.setItem(STORAGE_KEY,JSON.stringify(calls));
   }catch(e){}
 })();
 
