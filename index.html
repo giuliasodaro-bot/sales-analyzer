@@ -1027,7 +1027,6 @@ async function importData(e){
       saveCalls(merged);
       renderDashboard();
 
-      // Backfill strengths/improvements on calls that don't have them
       const needsBackfill=merged.filter(c=>!c.strengths||!c.strengths.length);
       if(!needsBackfill.length){
         alert('Imported '+imported.length+' calls ('+merged.length+' total). All up to date.');
@@ -1035,53 +1034,57 @@ async function importData(e){
       }
       const apiKey=document.getElementById('api-key').value.trim();
       if(!apiKey){
-        alert('Imported '+imported.length+' calls. '+needsBackfill.length+' calls need backfill — enter your API key in the Analyze tab and re-import to auto-fill strengths/improvements.');
+        alert('Imported '+imported.length+' calls. '+needsBackfill.length+' need backfill — enter API key in Analyze tab and re-import.');
         return;
       }
-      const confirmed=confirm('Imported '+imported.length+' calls. '+needsBackfill.length+' calls are missing strengths/improvements. Backfill now? (uses API)');
+      const confirmed=confirm('Imported '+imported.length+' calls. '+needsBackfill.length+' missing strengths/improvements. Backfill now?');
       if(!confirmed) return;
 
-      // Show progress
-      const progressDiv=document.createElement('div');
-      progressDiv.style.cssText='position:fixed;bottom:20px;right:20px;background:var(--accent);color:#fff;padding:12px 18px;border-radius:var(--radius-lg);font-size:13px;z-index:999';
-      progressDiv.textContent='Backfilling 0/'+needsBackfill.length+'...';
-      document.body.appendChild(progressDiv);
+      let prog=document.getElementById('import-progress');
+      if(!prog){
+        prog=document.createElement('div');
+        prog.id='import-progress';
+        prog.style.cssText='position:fixed;bottom:20px;right:20px;background:#185FA5;color:#fff;padding:12px 18px;border-radius:12px;font-size:13px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2)';
+        document.body.appendChild(prog);
+      }
 
       let done=0;
       for(const c of needsBackfill){
+        prog.textContent='Backfilling '+done+'/'+needsBackfill.length+'...';
         try{
           const source=c.transcript?
-            `Transcript:
-${c.transcript.substring(0,3000)}`:
-            `Feedback summary:
-${c.feedback||''}
-Scores: ${JSON.stringify(c.scores||{})}`;
+            'Transcript:
+'+c.transcript.substring(0,3000):
+            'Feedback:
+'+(c.feedback||'')+'
+Scores: '+JSON.stringify(c.scores||{});
           const resp=await fetch('https://api.anthropic.com/v1/messages',{
             method:'POST',
             headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
             body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:400,
-              system:'You are a sales coach. Given a call transcript or feedback summary, return ONLY valid JSON with exactly 3 strengths and 3 improvements: {"strengths":["...","...","..."],"improvements":["...","...","..."]}. Be specific and actionable.',
+              system:'You are a sales coach. Return ONLY valid JSON: {"strengths":["...","...","..."],"improvements":["...","...","..."]} — 3 specific strengths and 3 specific improvements from this call.',
               messages:[{role:'user',content:source}]
             })
           });
           const data=await resp.json();
           if(!data.error){
-            const text=data.content.map(b=>b.text||'').join('');
-            const match=text.replace(/```json|```/g,'').trim().match(/\{[\s\S]*\}/);
-            if(match){
-              const parsed=JSON.parse(match[0]);
+            const text=data.content.map(function(b){return b.text||'';}).join('');
+            const clean=text.replace(/```json|```/g,'').trim();
+            const start=clean.indexOf('{');
+            const end=clean.lastIndexOf('}');
+            if(start>-1&&end>-1){
+              const parsed=JSON.parse(clean.substring(start,end+1));
               c.strengths=parsed.strengths||[];
               c.improvements=parsed.improvements||[];
             }
           }
-        }catch(err){console.warn('Backfill failed for call',c.id,err);}
+        }catch(err){console.warn('Backfill error',c.id,err);}
         done++;
-        if(progressDiv.parentNode) progressDiv.textContent='Backfilling '+done+'/'+needsBackfill.length+'...';
         saveCalls(merged);
       }
-      if(progressDiv.parentNode) progressDiv.parentNode.removeChild(progressDiv);
+      prog.textContent='Done! '+done+' calls backfilled.';
+      setTimeout(function(){if(prog&&prog.parentNode)prog.parentNode.removeChild(prog);},3000);
       renderDashboard();
-      alert('Done! Backfilled '+done+' calls.');
     }catch(err){alert('Import failed: '+err.message);}
   };
   reader.readAsText(file);
