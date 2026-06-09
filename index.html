@@ -835,37 +835,66 @@ function loadSynth(key){try{var d=localStorage.getItem(key);return d?JSON.parse(
 function saveSynth(key,data){try{localStorage.setItem(key,JSON.stringify(data));}catch(e){}}
 
 // SYNTHESIZE FEEDBACK
-async function synthesizeFeedback(){
-  var apiKey=document.getElementById('api-key').value.trim();
-  if(!apiKey){alert('Enter your API key in the Analyze tab first.');return;}
+function synthesizeFeedback(){
   var calls=getFiltered();
   if(!calls.length) return;
   var btn=document.getElementById('btn-synth');
-  btn.disabled=true; btn.textContent='...';
-  document.getElementById('synth-content').textContent='Analyzing...';
-  var allS=calls.map(function(c){return (c.strengths||[]).join('; ');}).join('\n');
-  var allI=calls.map(function(c){return (c.improvements||[]).join('; ');}).join('\n');
-  try{
-    var resp=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:500,
-        system:'Sales coach. Given strengths and improvements from multiple calls, return ONLY valid JSON: {"strengths":["...","...","..."],"improvements":["...","...","..."]}',
-        messages:[{role:'user',content:calls.length+' calls.\nStrengths:\n'+allS+'\nImprovements:\n'+allI}]
-      })
-    });
-    var data=await resp.json();
-    if(data.error) throw new Error(data.error.message);
-    var text=data.content.map(function(b){return b.text||'';}).join('');
-    var s=text.indexOf('{'),e=text.lastIndexOf('}');
-    var parsed=JSON.parse(text.substring(s,e+1));
-    renderFeedbackBox('synth-content',parsed.strengths,parsed.improvements);
-    saveSynth(getSynthKey(getFiltered()),parsed);
-    document.getElementById('btn-synth').textContent='Refresh insights';
-  }catch(err){
-    document.getElementById('synth-content').textContent='Error: '+err.message;
+  var allS=[], allI=[];
+  calls.forEach(function(c){
+    (c.strengths||[]).forEach(function(s){if(s&&s!=='...') allS.push(s);});
+    (c.improvements||[]).forEach(function(i){if(i&&i!=='...') allI.push(i);});
+  });
+  if(!allS.length&&!allI.length){
+    document.getElementById('synth-content').textContent='No strengths or improvements stored for these calls yet. Import or analyze calls first.';
+    return;
   }
-  btn.disabled=false; btn.textContent='Generate insights';
+  // Find recurring themes by keyword frequency
+  function extractThemes(items, topN){
+    // Score each item by how many keywords it shares with others
+    var keywords=[
+      'discovery','rapport','emotional','close','objection','pitch','EQ','belief','commitment',
+      'accountability','follow','urgency','trust','pain','financial','nervous','structure',
+      'reframe','process','transparency','consistent','anchor','pattern','mindset','control'
+    ];
+    var scores=items.map(function(item){
+      var score=0;
+      var lower=item.toLowerCase();
+      keywords.forEach(function(k){ if(lower.indexOf(k.toLowerCase())>=0) score++; });
+      // Also score by how many other items share at least one keyword
+      items.forEach(function(other){
+        if(other===item) return;
+        var otherLower=other.toLowerCase();
+        keywords.forEach(function(k){
+          if(lower.indexOf(k.toLowerCase())>=0&&otherLower.indexOf(k.toLowerCase())>=0) score++;
+        });
+      });
+      return {item:item,score:score};
+    });
+    scores.sort(function(a,b){return b.score-a.score;});
+    // Deduplicate — skip items too similar to already picked ones
+    var picked=[];
+    scores.forEach(function(s){
+      if(picked.length>=topN) return;
+      var tooSimilar=picked.some(function(p){
+        var words=s.item.toLowerCase().split(' ').filter(function(w){return w.length>5;});
+        var matches=words.filter(function(w){return p.toLowerCase().indexOf(w)>=0;});
+        return matches.length>=2;
+      });
+      if(!tooSimilar) picked.push(s.item);
+    });
+    // Pad if needed
+    scores.forEach(function(s){
+      if(picked.length>=topN) return;
+      if(picked.indexOf(s.item)<0) picked.push(s.item);
+    });
+    return picked.slice(0,topN);
+  }
+  var top3S=extractThemes(allS,3);
+  var top3I=extractThemes(allI,3);
+  var result={strengths:top3S,improvements:top3I};
+  renderFeedbackBox('synth-content',result.strengths,result.improvements);
+  saveSynth(getSynthKey(calls),result);
+  btn.textContent='Refresh insights';
 }
 
 // EXPORT / IMPORT
