@@ -439,7 +439,7 @@ function showPage(id,btn){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
   btn.classList.add('active');
-  if(id==='dashboard') renderDashboard();
+  if(id==='dashboard'){try{renderDashboard();}catch(e){console.error('Dashboard error:',e);}}
 }
 function selectAccount(el,name,c){
   document.querySelectorAll('.account-btn').forEach(b=>b.classList.remove('active'));
