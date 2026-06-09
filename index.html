@@ -284,10 +284,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
   <!-- Calls table -->
   <div class="card" style="padding:0;overflow:hidden"><div id="calls-list"></div></div>
-  <!-- Installment schedule -->
-  <div class="revenue-section" id="installment-section" style="display:none;margin-top:1rem">
-    <div class="revenue-title">Revenue schedule — projected installments</div>
-    <div id="installment-list"></div>
+  <!-- Recurring payments table -->
+  <div class="card" id="recurring-section" style="display:none;margin-top:1rem">
+    <div style="font-size:12px;font-weight:700;letter-spacing:.07em;color:var(--muted);margin-bottom:1rem">RECURRING PAYMENTS</div>
+    <div id="recurring-list"></div>
   </div>
 </div>
 
@@ -770,26 +770,78 @@ function renderDashboard(){
         +'</tr>';
     }).join('')+'</tbody></table>';
 
-  // Installment schedule
-  var schedKeys=Object.keys(schedMap).sort();
-  var instEl=document.getElementById('installment-section');
-  if(schedKeys.length){
-    instEl.style.display='block';
-    document.getElementById('installment-list').innerHTML=schedKeys.map(function(m){
-      var a=schedMap[m].active,p=schedMap[m].passive,total=a+p;
-      var lbl=new Date(m+'-15').toLocaleDateString('en-GB',{month:'short',year:'numeric'});
-      var isCur=m===now;
-      return '<div class="installment-row">'
-        +'<span class="inst-month">'+lbl+'</span>'
-        +'<span class="inst-amount">$'+total.toLocaleString()+'</span>'
-        +'<span style="font-size:12px;color:var(--success);font-weight:500">+$'+schedMap[m].commission.toLocaleString()+' comm</span>'
-        +(a?'<span class="inst-badge inst-collected">Active $'+a.toLocaleString()+'</span>':'')
-        +(p?'<span class="inst-badge inst-projected">Passive $'+p.toLocaleString()+'</span>':'')
-        +(isCur?'<span style="font-size:11px;color:var(--accent);font-weight:500">← now</span>':'')
-        +'</div>';
+  // Recurring payments table
+  var recurringEl=document.getElementById('recurring-section');
+  var recurringList=document.getElementById('recurring-list');
+  var recurringRows=[];
+  // Show recurring payments for closed calls with installments > 1
+  allClosed.forEach(function(c){
+    if(fa&&c.account!==fa) return;
+    if(!c.installments||c.installments<=1) return;
+    var insts=projectInstallments(c);
+    if(!insts.length) return;
+    var callMon=monthKey(new Date(c.timestamp));
+    insts.forEach(function(r,i){
+      var inRange=noDateFilter?(r.month<=todayMonth):(r.month>=rangeStart&&r.month<=rangeEnd);
+      if(!inRange) return;
+      var instNum=i+1;
+      recurringRows.push({
+        account:c.account,
+        client:c.client||'—',
+        instNum:instNum,
+        instTotal:c.installments,
+        amount:r.amount,
+        commission:r.commission,
+        month:r.month,
+        first:r.first
+      });
+    });
+  });
+  if(recurringRows.length){
+    recurringEl.style.display='block';
+    var totalAmt=recurringRows.reduce(function(s,r){return s+r.amount;},0);
+    var totalComm=recurringRows.reduce(function(s,r){return s+r.commission;},0);
+    // Total commission on all revenue generated (contracted value * comm rate)
+    var totalCommOnRev=0;
+    allClosed.forEach(function(c){
+      if(fa&&c.account!==fa) return;
+      totalCommOnRev+=Math.round((c.generatedRevenue||0)*(c.comm||0)/100);
+    });
+    var thead='<table style="width:100%;border-collapse:collapse;font-size:13px">'
+      +'<thead><tr style="color:var(--muted);font-size:11px;font-weight:700;letter-spacing:.06em;border-bottom:1px solid var(--border-md)">'
+      +'<th style="text-align:left;padding:6px 8px">ACCOUNT</th>'
+      +'<th style="text-align:left;padding:6px 8px">CLIENT</th>'
+      +'<th style="text-align:left;padding:6px 8px">INSTALLMENT</th>'
+      +'<th style="text-align:left;padding:6px 8px">MONTH</th>'
+      +'<th style="text-align:right;padding:6px 8px">AMOUNT</th>'
+      +'<th style="text-align:right;padding:6px 8px">COMMISSION</th>'
+      +'</tr></thead><tbody>';
+    var tbody=recurringRows.map(function(r){
+      var lbl=new Date(r.month+'-15').toLocaleDateString('en-GB',{month:'short',year:'numeric'});
+      var badge=r.first
+        ?'<span style="font-size:10px;background:var(--accent-light);color:var(--accent);padding:2px 6px;border-radius:4px;font-weight:600">Active</span>'
+        :'<span style="font-size:10px;background:#f3f0ff;color:var(--purple);padding:2px 6px;border-radius:4px;font-weight:600">Passive</span>';
+      return '<tr style="border-bottom:1px solid var(--border)">'
+        +'<td style="padding:8px 8px;font-weight:600">'+r.account+'</td>'
+        +'<td style="padding:8px 8px">'+r.client+'</td>'
+        +'<td style="padding:8px 8px">'+badge+' '+r.instNum+'/'+r.instTotal+'</td>'
+        +'<td style="padding:8px 8px;color:var(--muted)">'+lbl+'</td>'
+        +'<td style="padding:8px 8px;text-align:right;font-weight:600">$'+r.amount.toLocaleString()+'</td>'
+        +'<td style="padding:8px 8px;text-align:right;color:var(--success);font-weight:600">$'+r.commission.toLocaleString()+'</td>'
+        +'</tr>';
     }).join('');
+    var tfoot='<tr style="border-top:2px solid var(--border-md);font-weight:700;background:var(--surface2)">'
+      +'<td colspan="4" style="padding:10px 8px;font-size:12px;font-weight:700;letter-spacing:.05em">TOTALS</td>'
+      +'<td style="padding:10px 8px;text-align:right;font-size:14px">$'+totalAmt.toLocaleString()+'</td>'
+      +'<td style="padding:10px 8px;text-align:right;font-size:14px;color:var(--success)">$'+totalComm.toLocaleString()+'</td>'
+      +'</tr>'
+      +'<tr style="background:var(--surface2)">'
+      +'<td colspan="5" style="padding:6px 8px;font-size:12px;color:var(--muted)">Total commission on contracted revenue</td>'
+      +'<td style="padding:6px 8px;text-align:right;font-size:13px;color:var(--success);font-weight:600">$'+totalCommOnRev.toLocaleString()+'</td>'
+      +'</tr>';
+    recurringList.innerHTML=thead+tbody+'</tbody><tfoot>'+tfoot+'</tfoot></table>';
   }else{
-    instEl.style.display='none';
+    recurringEl.style.display='none';
   }
 }
 
