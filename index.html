@@ -1119,8 +1119,7 @@ async function rescoreAll(){
   var apiKey=document.getElementById('api-key').value.trim();
   if(!apiKey){alert('Enter your API key in the Analyze tab first.');return;}
   var calls=loadCalls();
-  var withTranscript=calls.filter(function(c){return c.transcript&&c.transcript.length>100;});
-  if(!withTranscript.length){alert('No calls with stored transcripts found.');return;}
+  var withTranscript=calls;
   if(!confirm('Re-score '+withTranscript.length+' calls with the updated rubric? This will overwrite existing scores, strengths and improvements.')) return;
   var prog=document.createElement('div');
   prog.style.cssText='position:fixed;bottom:20px;right:20px;background:#185FA5;color:#fff;padding:12px 18px;border-radius:12px;font-size:13px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2)';
@@ -1132,11 +1131,14 @@ async function rescoreAll(){
     var isNoPitch=c.callType==='not_pitched'||c.callType==='no_show';
     var system='You are an expert sales coach. Return ONLY valid JSON, no markdown.\n\nExtract from transcript:\n- closer_name: salesperson name (empty if unclear)\n- client_name: prospect name (empty if unclear)\n- generated_revenue: total contract value USD (0 if not closed)\n- cash_collected: amount paid today USD (0 if not mentioned)\n- installments: number of monthly installments (1 if single, 0 if not closed)\n\n{\n  "closer_name":"","client_name":"","generated_revenue":0,"cash_collected":0,"installments":0,\n  "scores":{"call_control":<0-10>,"discovery_depth":<0-10>,"belief_shifting":<0-10>,"objection_handling":<0-10>,"pitch_effectiveness":<0-10>,"closing_strength":<0-10>,"eq_in_closing":<0-10>},\n  "phases":{"opener":<min>,"discovery":<min>,"pitch":<min>,"objection_handling":<min>,"close":<min>},\n  "strengths":["<strength1>","<strength2>","<strength3>"],\n  "improvements":["<improvement1>","<improvement2>","<improvement3>"],\n  "outcome":"<closed|no_close|follow_up|unknown>"\n}\n\n'+(isNoPitch?'No pitch was made. Score accordingly.\n\n':'')+'Scoring rubric (be fair and calibrated — a solid competent call should score 6-8, not 4-5):\n\ncall_control: 8-10=strong frame, clear agenda, controls pace confidently; 6-7=mostly in control with minor drift; 4-5=loses frame or lets prospect lead too much; <4=no control.\n\ndiscovery_depth: 8-10=deep SPIN+NEPQ, surfaces emotional drivers, pain, consequences; 6-7=good discovery with some emotional depth; 4-5=surface-level questions only; <4=minimal discovery.\n\nbelief_shifting: 8-10=effectively challenges limiting beliefs and reframes mindset; 6-7=some reframing present; 4-5=mostly informational, little mindset work; <4=none.\n\nobjection_handling: 8-10=handles objections at root level, neutralises fully; 6-7=addresses objections reasonably; 4-5=surface-level handling or avoids; <4=ignores objections.\n\npitch_effectiveness: 8-10=tailored, benefit-led, connected to discovered pain; 6-7=decent pitch with some personalisation; 4-5=generic pitch; <4=weak or absent pitch.\n\nclosing_strength: 8-10=assumptive, decisive ask, handles hesitation well; 6-7=asks for the close, some uncertainty; 4-5=weak ask or relies on prospect to close; <4=no close attempted.\n\neq_in_closing: 8-10=exceptional emotional attunement, warmth, safety throughout; 6-7=good EQ with mostly positive rapport; 4-5=functional but lacks warmth; <4=cold or disconnected.\n\nIMPORTANT: Do not score harshly just because the call did not close. Score the PROCESS, not the outcome.';
     try{
+      var callContent=c.transcript&&c.transcript.length>50
+        ?'Transcript:\n'+c.transcript.substring(0,6000)
+        :'Call data:\nClient: '+(c.client||'')+'\nOutcome: '+(c.outcome||'')+'\nCall type: '+(c.callType||'')+'\nStrengths: '+(c.strengths||[]).join('; ')+'\nImprovements: '+(c.improvements||[]).join('; ');
       var resp=await fetch('https://api.anthropic.com/v1/messages',{
         method:'POST',
         headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
         body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:system,
-          messages:[{role:'user',content:'Transcript:\n'+c.transcript.substring(0,6000)}]
+          messages:[{role:'user',content:callContent}]
         })
       });
       var data=await resp.json();
