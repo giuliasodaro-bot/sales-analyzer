@@ -215,6 +215,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <h2>Dashboard</h2>
     <div style="display:flex;gap:6px">
       <button class="btn-sm" onclick="rescoreAll()">Re-score all</button>
+      <button class="btn-sm" onclick="calibrateScores()">Calibrate scores</button>
       <button class="btn-sm" onclick="cleanDuplicates()">Remove duplicates</button>
       <button class="btn-sm" onclick="exportData()">↓ Export</button>
       <label class="btn-sm" style="cursor:pointer;margin:0">↑ Import<input type="file" accept=".json" id="import-input" onchange="importData(event)" style="display:none"/></label>
@@ -1087,6 +1088,33 @@ function debugMissing(){
   }).join('\n');
   alert(missing.length+' calls missing strengths:\n'+report);
 }
+function calibrateScores(){
+  if(!confirm('Apply calibration to all stored scores? This will adjust scores up based on the rubric comparison and cannot be undone without a backup.')) return;
+  var deltas={
+    call_control:2,
+    discovery_depth:2,
+    belief_shifting:1,
+    objection_handling:1,
+    pitch_effectiveness:2,
+    closing_strength:2,
+    eq_in_closing:0
+  };
+  var calls=loadCalls();
+  var updated=0;
+  calls.forEach(function(c){
+    if(!c.scores) return;
+    Object.keys(deltas).forEach(function(k){
+      if(typeof c.scores[k]==='number'){
+        c.scores[k]=Math.min(10, c.scores[k]+deltas[k]);
+      }
+    });
+    updated++;
+  });
+  saveCalls(calls);
+  alert('Calibrated '+updated+' calls. Export a backup if needed.');
+  renderDashboard();
+}
+
 async function rescoreAll(){
   var apiKey=document.getElementById('api-key').value.trim();
   if(!apiKey){alert('Enter your API key in the Analyze tab first.');return;}
