@@ -550,16 +550,50 @@ async function runAnalysis(){
 
 
 
-function renderScoreGrid(elId,scores){
+function renderScoreGrid(elId,scores,editable){
   var el=document.getElementById(elId); if(!el) return;
   var html=SCORE_KEYS.map(function(k){
     var v=scores[k]||0, c=cls(v);
-    return '<div class="score-card"><div class="score-lbl">'+SCORE_LABELS[k]+'</div><div class="score-num '+c+'">'+v+'</div><div class="bar"><div class="bar-inner '+c+'" style="width:'+(v*10)+'%"></div></div></div>';
+    var numEl=editable
+      ?'<input type="number" min="0" max="10" step="1" value="'+v+'" data-key="'+k+'" onchange="updateModalScore(this)" style="width:44px;font-size:18px;font-weight:700;border:1px solid var(--border-md);border-radius:4px;padding:2px 4px;color:var(--text);text-align:center" class="'+c+'">'
+      :'<div class="score-num '+c+'">'+v+'</div>';
+    return '<div class="score-card"><div class="score-lbl">'+SCORE_LABELS[k]+'</div>'+numEl+'<div class="bar"><div class="bar-inner '+c+'" style="width:'+(v*10)+'%" id="bar-'+k+'"></div></div></div>';
   }).join('');
-  // EQ separately
   var eq=scores[EQ_KEY]||0, eqc=cls(eq);
-  html+='<div class="score-card" style="border:1px solid var(--border-md)"><div class="score-lbl">EQ in closing</div><div class="score-num '+eqc+'">'+eq+' / 10</div><div class="bar"><div class="bar-inner '+eqc+'" style="width:'+(eq*10)+'%"></div></div></div>';
+  var eqEl=editable
+    ?'<input type="number" min="0" max="10" step="1" value="'+eq+'" data-key="'+EQ_KEY+'" onchange="updateModalScore(this)" style="width:44px;font-size:18px;font-weight:700;border:1px solid var(--border-md);border-radius:4px;padding:2px 4px;color:var(--text);text-align:center" class="'+eqc+'">'
+    :'<div class="score-num '+eqc+'">'+eq+' / 10</div>';
+  html+='<div class="score-card" style="border:1px solid var(--border-md)"><div class="score-lbl">EQ in closing</div>'+eqEl+'<div class="bar"><div class="bar-inner '+eqc+'" style="width:'+(eq*10)+'%" id="bar-'+EQ_KEY+'"></div></div></div>';
   el.innerHTML=html;
+}
+
+function updateModalScore(input){
+  var k=input.getAttribute('data-key');
+  var v=Math.max(0,Math.min(10,parseInt(input.value)||0));
+  input.value=v;
+  var c=cls(v);
+  input.className=c;
+  var bar=document.getElementById('bar-'+k);
+  if(bar){bar.className='bar-inner '+c;bar.style.width=(v*10)+'%';}
+  // Update total score display
+  var allInputs=document.querySelectorAll('#m-scores input[data-key]');
+  var total=0;
+  allInputs.forEach(function(inp){
+    var key=inp.getAttribute('data-key');
+    if(key!==EQ_KEY) total+=Math.max(0,Math.min(10,parseInt(inp.value)||0));
+  });
+  var totalEl=document.querySelector('#m-total-score');
+  if(totalEl) totalEl.textContent=total+' / 60';
+  // Save to calls immediately
+  if(openCallId){
+    var calls=loadCalls();
+    var c2=calls.find(function(x){return x.id===openCallId;});
+    if(c2){
+      if(!c2.scores) c2.scores={};
+      c2.scores[k]=v;
+      saveCalls(calls);
+    }
+  }
 }
 
 function renderPhaseGrid(elId,phases,suffix){
@@ -1028,7 +1062,7 @@ function openModal(id){
     +'<div class="stat"><div class="stat-label">Remaining</div><div class="stat-val" style="color:var(--purple)">'+fmtMoney(remaining)+'</div></div>'
     +'<div class="stat"><div class="stat-label">Installments</div><div class="stat-val">'+(c.installments||'—')+'</div></div>'
     +'<div class="stat"><div class="stat-label">Commission</div><div class="stat-val" style="color:var(--success)">'+fmtMoney(c.cashCollected?Math.round(c.cashCollected*c.comm/100):0)+'</div></div>';
-  renderScoreGrid('m-scores',c.scores||{});
+  renderScoreGrid('m-scores',c.scores||{},true);
   renderPhaseGrid('m-phases',c.phases||{});
   renderFeedbackBox('m-feedback',c.strengths,c.improvements);
   // Pre-fill update fields
