@@ -342,6 +342,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="phase-grid" id="m-phases"></div>
     <div class="modal-section">Coaching feedback</div>
     <div class="feedback-box" id="m-feedback"></div>
+    <div class="modal-section">Stored transcript <span id="m-transcript-status" style="font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0;font-size:12px"></span></div>
+    <div id="m-transcript-box" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;max-height:0;overflow:hidden;transition:max-height 0.2s;font-size:12px;line-height:1.5;white-space:pre-wrap;color:var(--text)"></div>
+    <button class="btn-sm" id="m-transcript-toggle" onclick="toggleTranscriptView()" style="margin-top:6px">Show transcript</button>
     <div class="modal-section">Update call</div>
     <div class="row3" style="margin-bottom:8px">
       <div class="field"><label>Outcome</label>
@@ -1065,6 +1068,11 @@ function openModal(id){
   renderScoreGrid('m-scores',c.scores||{},true);
   renderPhaseGrid('m-phases',c.phases||{});
   renderFeedbackBox('m-feedback',c.strengths,c.improvements);
+  var hasTranscript=c.transcript&&c.transcript.length>50;
+  document.getElementById('m-transcript-status').textContent=hasTranscript?'('+c.transcript.length+' characters stored)':'(none stored)';
+  document.getElementById('m-transcript-box').textContent=hasTranscript?c.transcript:'No transcript stored for this call.';
+  document.getElementById('m-transcript-box').style.maxHeight='0';
+  document.getElementById('m-transcript-toggle').textContent='Show transcript';
   // Pre-fill update fields
   var ot=(c.outcome||'unknown').toLowerCase();
   var mout=document.getElementById('m-outcome');
@@ -1080,6 +1088,20 @@ function openModal(id){
 }
 
 function closeModalOverlay(e){if(e.target.id==='modal') document.getElementById('modal').classList.remove('open');}
+
+function toggleTranscriptView(){
+  var box=document.getElementById('m-transcript-box');
+  var btn=document.getElementById('m-transcript-toggle');
+  var isOpen=box.style.maxHeight!=='0px'&&box.style.maxHeight!=='0';
+  if(isOpen){
+    box.style.maxHeight='0';
+    btn.textContent='Show transcript';
+  } else {
+    box.style.maxHeight='400px';
+    box.style.overflowY='auto';
+    btn.textContent='Hide transcript';
+  }
+}
 
 async function reanalyzeCall(){
   var apiKey=document.getElementById('api-key').value.trim();
