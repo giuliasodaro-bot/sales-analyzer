@@ -899,23 +899,22 @@ function renderDashboard(){
         +'<td style="color:var(--muted);white-space:nowrap">'+dt+'</td>'
         +'<td style="font-weight:500">'+c.account+'</td>'
         +'<td>'+(c.client||'—')+'</td>'
-        +'<td><span class="badge '+(typeCls[ct]||'badge-fdq')+'">'+(typeLbl[ct]||ct)+'</span></td>'
         +'<td><span style="font-weight:600;color:'+sc+'">'+a+'/60</span></td>'
         +'<td>'+fmtMoney(c.cashCollected)+'</td>'
         +'<td>'+fmtMoney(c.generatedRevenue)+'</td>'
         +'<td style="color:var(--success);font-weight:500">'+(comm2?'$'+comm2.toLocaleString():'—')+'</td>'
-        +(c.rescored?'<td><span class="badge badge-rescored" title="Re-scored with calibrated rubric">✓</span></td>':'<td><span class="badge badge-unscored" title="No transcript — score may be uncalibrated">?</span></td>')+'<td><span class="badge '+(outCls[ot]||'badge-unknown')+'">'+(outLbl[ot]||ot)+'</span></td>'
+        +(c.transcript&&c.transcript.length>100?'<td><span class="badge badge-rescored" title="Transcript stored">✓</span></td>':'<td><span class="badge badge-unscored" title="No transcript stored">?</span></td>')+'<td><span class="badge '+(typeCls[ct]||'badge-fdq')+'">'+(typeLbl[ct]||ct)+'</span> <span class="badge '+(outCls[ot]||'badge-unknown')+'">'+(outLbl[ot]||ot)+'</span></td>'
         +'<td>'+(c.fathom&&c.fathom.url?'<a href="'+c.fathom.url+'" target="_blank" onclick="event.stopPropagation()" style="font-size:11px;color:var(--accent-mid)">▶</a>':'')+'</td>'
         +'</tr>';
     }).join('');
   var tfootRow='<tr style="border-top:2px solid var(--border-md);font-weight:700;background:var(--surface2)">'
-    +'<td colspan="7" style="padding:10px 12px;font-size:12px;letter-spacing:.05em">TOTALS</td>'
+    +'<td colspan="6" style="padding:10px 12px;font-size:12px;letter-spacing:.05em">TOTALS</td>'
     +'<td style="padding:10px 12px">$'+totalCash.toLocaleString()+'</td>'
     +'<td style="padding:10px 12px">$'+totalRev.toLocaleString()+'</td>'
     +'<td style="padding:10px 12px;color:var(--success)">$'+totalComm2.toLocaleString()+'</td>'
     +'<td colspan="2"></td>'
     +'</tr>';
-  list.innerHTML='<table class="calls-table"><thead><tr><th style="width:28px"></th><th>Date</th><th>Account</th><th>Client</th><th>Type</th><th>Score</th><th>Cash</th><th>Revenue</th><th>Commission</th><th title="Score calibration">Cal.</th><th>Outcome</th><th></th></tr></thead><tbody>'+rows+'</tbody><tfoot>'+tfootRow+'</tfoot></table>';
+  list.innerHTML='<table class="calls-table"><thead><tr><th style="width:28px"></th><th>Date</th><th>Account</th><th>Client</th><th>Score</th><th>Cash</th><th>Revenue</th><th>Commission</th><th title="Score calibration">Cal.</th><th>Type / Outcome</th><th></th></tr></thead><tbody>'+rows+'</tbody><tfoot>'+tfootRow+'</tfoot></table>';
 
   // Objections ranking
   var objPatterns=[
