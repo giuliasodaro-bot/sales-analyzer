@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -686,10 +684,8 @@ function saveCall(){
 
 // INSTALLMENT PROJECTION
 function projectInstallments(call){
-  // No installments to project if not closed, no revenue, or paid in full (cash == revenue)
+  // No installments to project if not closed or no revenue on record
   if(!call.generatedRevenue||!call.installments||call.installments<=0) return [];
-  if(call.cashCollected>=call.generatedRevenue) return [];
-  if(call.installments===1) return [];
   var instAmt=Math.round(call.generatedRevenue/call.installments);
   var commAmt=Math.round(instAmt*(call.comm||0)/100);
   var callDate=new Date(call.timestamp);
@@ -698,12 +694,19 @@ function projectInstallments(call){
   // (e.g. May 31 + 1 month must be June, not spill into July).
   var baseYear=callDate.getUTCFullYear();
   var baseMonth=callDate.getUTCMonth(); // 0-indexed
-  var rows=[];
-  for(var i=0;i<call.installments;i++){
+  function mkFor(i){
     var total=baseMonth+i;
     var y=baseYear+Math.floor(total/12);
     var m=(total%12)+1; // 1-indexed
-    var mk=y+'-'+(m<10?'0'+m:m);
+    return y+'-'+(m<10?'0'+m:m);
+  }
+  // Single-installment deal (1/1): just the one payment, always shown as the "Active" row.
+  if(call.installments===1) return [{month:mkFor(0),amount:instAmt,commission:commAmt,first:true}];
+  // Multi-installment deal already paid in full: nothing left to project.
+  if(call.cashCollected>=call.generatedRevenue) return [];
+  var rows=[];
+  for(var i=0;i<call.installments;i++){
+    var mk=mkFor(i);
     rows.push({month:mk,amount:instAmt,commission:commAmt,first:i===0});
   }
   return rows;
@@ -1022,10 +1025,10 @@ function renderDashboard(){
   var recurringEl=document.getElementById('recurring-section');
   var recurringList=document.getElementById('recurring-list');
   var recurringRows=[];
-  // Show recurring payments for closed calls with installments > 1
+  // Show recurring payments for all closed calls with a recorded installment count (incl. 1/1 paid-in-full deals)
   allClosed.forEach(function(c){
     if(fa&&c.account!==fa) return;
-    if(!c.installments||c.installments<=1) return;
+    if(!c.installments||c.installments<1) return;
     var insts=projectInstallments(c);
     if(!insts.length) return;
     var callMon=monthKey(new Date(c.timestamp));
