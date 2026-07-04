@@ -29,7 +29,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .page.active{display:block;}
 .card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem 1.5rem;margin-bottom:1rem;}
 .card-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:12px;}
-.account-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.account-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
 .account-btn{border:0.5px solid var(--border-md);border-radius:var(--radius);padding:12px;cursor:pointer;background:var(--surface);text-align:left;transition:all 0.15s;}
 .account-btn:hover{background:var(--surface2);}
 .account-btn.active{border:2px solid var(--accent-mid);background:var(--accent-light);}
@@ -153,8 +153,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="card-title">Account</div>
     <div class="account-grid">
       <button class="account-btn active" onclick="selectAccount(this,'AlwaysCoach',10)"><div class="name">AlwaysCoach</div><div class="comm">10% commission</div></button>
-      <button class="account-btn" onclick="selectAccount(this,'Incontrera',14)"><div class="name">Incontrera</div><div class="comm">14% commission</div></button>
       <button class="account-btn" onclick="selectAccount(this,'Moves Method',8)"><div class="name">Moves Method</div><div class="comm">8% commission</div></button>
+      <button class="account-btn" onclick="selectAccount(this,'Fabien Dating',null,'fabien')"><div class="name">Fabien Dating</div><div class="comm">15–30% of net revenue</div></button>
+      <button class="account-btn" onclick="selectAccount(this,'Complete Social AI',15)"><div class="name">Complete Social AI</div><div class="comm">15% of total ticket</div></button>
+    </div>
+    <div id="fabien-program-wrap" style="display:none;margin-top:10px">
+      <div class="card-title" style="margin-bottom:8px">Fabien Dating — program</div>
+      <div class="type-grid" style="grid-template-columns:1fr 1fr">
+        <button type="button" class="type-btn" id="fabien-prog-other" onclick="selectFabienProgram('other')"><div class="tname">Other programs</div><div class="tdesc">15% of net revenue</div></button>
+        <button type="button" class="type-btn" id="fabien-prog-2week" onclick="selectFabienProgram('2week')"><div class="tname">2-week ($500)</div><div class="tdesc">30% of net revenue</div></button>
+      </div>
+      <p class="field-note">Net revenue = total − 3.3% Stripe fee. Commission is paid on cash collected as it comes in.</p>
     </div>
   </div>
   <div class="card">
@@ -231,7 +240,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div class="filter-field"><label>Account</label>
         <select id="f-account" onchange="renderDashboard()">
           <option value="">All accounts</option>
-          <option>AlwaysCoach</option><option>Incontrera</option><option>Moves Method</option>
+          <option>AlwaysCoach</option><option>Moves Method</option><option>Fabien Dating</option><option>Complete Social AI</option>
         </select>
       </div>
       <div class="filter-field"><label>Call type</label>
@@ -271,6 +280,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="kpi"><div class="kpi-label">Close rate (showed)</div><div class="kpi-val" id="kpi-cr-showed">—</div><div class="kpi-sub" id="kpi-cr-showed-sub"></div></div>
     <div class="kpi"><div class="kpi-label">Close rate (pitched incl. FDQ)</div><div class="kpi-val" id="kpi-cr-pitched-all">—</div><div class="kpi-sub" id="kpi-cr-pitched-all-sub"></div></div>
     <div class="kpi"><div class="kpi-label">Close rate (pitched excl. FDQ)</div><div class="kpi-val" id="kpi-cr-pitched-excl">—</div><div class="kpi-sub" id="kpi-cr-pitched-excl-sub"></div></div>
+  </div>
+  <!-- Row 4: Per-call efficiency -->
+  <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr)">
+    <div class="kpi"><div class="kpi-label">Revenue / booked call</div><div class="kpi-val" id="kpi-rev-per-booked">—</div></div>
+    <div class="kpi"><div class="kpi-label">Revenue / call taken</div><div class="kpi-val" id="kpi-rev-per-taken">—</div></div>
+    <div class="kpi"><div class="kpi-label">Cash collected / booked call</div><div class="kpi-val" id="kpi-cash-per-booked" style="color:var(--success)">—</div></div>
+    <div class="kpi"><div class="kpi-label">Cash collected / call taken</div><div class="kpi-val" id="kpi-cash-per-taken" style="color:var(--success)">—</div></div>
   </div>
   <!-- Coaching synthesis -->
   <div class="card" id="synth-section" style="display:none">
@@ -312,8 +328,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div><label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px">ACCOUNT</label>
         <select id="ns-account" class="form-input" style="width:100%">
           <option value="AlwaysCoach">AlwaysCoach</option>
-          <option value="Incontrera">Incontrera</option>
           <option value="Moves Method">Moves Method</option>
+          <option value="Fabien Dating">Fabien Dating</option>
+          <option value="Complete Social AI">Complete Social AI</option>
         </select></div>
       <div><label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px">CLIENT NAME (optional)</label>
         <input type="text" id="ns-client" class="form-input" placeholder="e.g. John Smith" style="width:100%"/></div>
@@ -422,6 +439,9 @@ var SCORE_LABELS={call_control:'Call control',discovery_depth:'Discovery depth',
 var PHASE_KEYS=['opener','discovery','pitch','objection_handling','close'];
 var PHASE_LABELS={opener:'Opener',discovery:'Discovery',pitch:'Pitch',objection_handling:'Objections',close:'Close'};
 var account='AlwaysCoach', comm=10, callType='pitched', currentResult=null, openCallId=null, fathomData=null;
+var fabienProgram='other';
+var STRIPE_FACTOR=1-0.033; // 3.3% Stripe fee deducted before commission on Fabien Dating
+var FABIEN_RATES={other:15,'2week':30};
 var selectedCallIds=new Set();
 function toggleCallSelect(id,checked){
   if(checked) selectedCallIds.add(id); else selectedCallIds.delete(id);
@@ -432,6 +452,8 @@ function toggleCallSelect(id,checked){
 document.addEventListener('DOMContentLoaded',function(){
   var d=document.getElementById('call-date');
   if(d) d.value=new Date().toISOString().substring(0,10);
+  var elOther=document.getElementById('fabien-prog-other');
+  if(elOther) elOther.classList.add('active');
 });
 
 function showPage(id,btn){
@@ -441,9 +463,24 @@ function showPage(id,btn){
   btn.classList.add('active');
   if(id==='dashboard') renderDashboard();
 }
-function selectAccount(el,name,c){
+function selectAccount(el,name,c,special){
   document.querySelectorAll('.account-btn').forEach(function(b){b.classList.remove('active');});
-  el.classList.add('active'); account=name; comm=c;
+  el.classList.add('active'); account=name;
+  var wrap=document.getElementById('fabien-program-wrap');
+  if(special==='fabien'){
+    wrap.style.display='block';
+    selectFabienProgram(fabienProgram||'other');
+  } else {
+    wrap.style.display='none';
+    comm=c;
+  }
+}
+function selectFabienProgram(prog){
+  fabienProgram=prog;
+  comm=Math.round(FABIEN_RATES[prog]*STRIPE_FACTOR*1000)/1000;
+  var elOther=document.getElementById('fabien-prog-other'), el2wk=document.getElementById('fabien-prog-2week');
+  if(elOther) elOther.classList.toggle('active',prog==='other');
+  if(el2wk) el2wk.classList.toggle('active',prog==='2week');
 }
 function selectType(el,type){
   document.querySelectorAll('.type-btn').forEach(function(b){b.classList.remove('active');});
@@ -538,7 +575,7 @@ async function runAnalysis(){
     var ts=(fd||cd)?((fd||cd)+'T12:00:00.000Z'):new Date().toISOString();
     currentResult={
       scores:parsed.scores,phases:parsed.phases,strengths:parsed.strengths||[],improvements:parsed.improvements||[],outcome:parsed.outcome||'unknown',
-      account:account,comm:comm,callType:callType,
+      account:account,comm:comm,callType:callType,program:(account==='Fabien Dating'?fabienProgram:null),
       closer:finalCloser,client:finalClient,
       generatedRevenue:effectiveGenRev,cashCollected:effectiveCash,installments:installments,refund:effectiveRefund,
       fathom:fathomData||null,transcript:transcript,timestamp:ts,id:Date.now()
@@ -654,11 +691,18 @@ function projectInstallments(call){
   var instAmt=Math.round(call.generatedRevenue/call.installments);
   var commAmt=Math.round(instAmt*(call.comm||0)/100);
   var callDate=new Date(call.timestamp);
+  // Use UTC year/month integer arithmetic (not Date.setMonth) so that a call date on the
+  // 29th/30th/31st doesn't roll over into the wrong month when the target month is shorter
+  // (e.g. May 31 + 1 month must be June, not spill into July).
+  var baseYear=callDate.getUTCFullYear();
+  var baseMonth=callDate.getUTCMonth(); // 0-indexed
   var rows=[];
   for(var i=0;i<call.installments;i++){
-    var d=new Date(callDate);
-    d.setMonth(d.getMonth()+i);
-    rows.push({month:monthKey(d),amount:instAmt,commission:commAmt,first:i===0});
+    var total=baseMonth+i;
+    var y=baseYear+Math.floor(total/12);
+    var m=(total%12)+1; // 1-indexed
+    var mk=y+'-'+(m<10?'0'+m:m);
+    rows.push({month:mk,amount:instAmt,commission:commAmt,first:i===0});
   }
   return rows;
 }
@@ -692,7 +736,7 @@ function saveNoShow(){
   var acct=document.getElementById('ns-account').value;
   var client=document.getElementById('ns-client').value.trim()||'No-show';
   var closer=document.getElementById('ns-closer').value.trim()||'Giulia Sodaro';
-  var commMap={'AlwaysCoach':10,'Incontrera':14,'Moves Method':8};
+  var commMap={'AlwaysCoach':10,'Moves Method':8,'Fabien Dating':Math.round(FABIEN_RATES.other*STRIPE_FACTOR*1000)/1000,'Complete Social AI':15};
   var rec={
     id:Date.now(),
     timestamp:(d||new Date().toISOString().substring(0,10))+'T12:00:00.000Z',
@@ -806,6 +850,13 @@ function renderDashboard(){
   document.getElementById('kpi-pitched-count').textContent=pitchedAll.length;
   document.getElementById('kpi-closed-count').textContent=closed.length;
   document.getElementById('kpi-fdq-count').textContent=fdqCalls.length;
+
+  // Per-call efficiency KPIs (revenue/cash relative to booked vs. taken calls), adapt to current filters
+  var totalCashForPeriod=cashPeriod+cashPassive;
+  document.getElementById('kpi-rev-per-booked').textContent=calls.length?('$'+Math.round(totalGenerated/calls.length).toLocaleString()):'—';
+  document.getElementById('kpi-rev-per-taken').textContent=taken.length?('$'+Math.round(totalGenerated/taken.length).toLocaleString()):'—';
+  document.getElementById('kpi-cash-per-booked').textContent=calls.length?('$'+Math.round(totalCashForPeriod/calls.length).toLocaleString()):'—';
+  document.getElementById('kpi-cash-per-taken').textContent=taken.length?('$'+Math.round(totalCashForPeriod/taken.length).toLocaleString()):'—';
 
   // Avg calls/day
   if(fd1&&fd2){
