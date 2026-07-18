@@ -155,15 +155,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <button class="account-btn active" onclick="selectAccount(this,'AlwaysCoach',10)"><div class="name">AlwaysCoach</div><div class="comm">10% commission</div></button>
       <button class="account-btn" onclick="selectAccount(this,'Moves Method',8)"><div class="name">Moves Method</div><div class="comm">8% commission</div></button>
       <button class="account-btn" onclick="selectAccount(this,'Fabien Dating',null,'fabien')"><div class="name">Fabien Dating</div><div class="comm">15–30% of net revenue</div></button>
-      <button class="account-btn" onclick="selectAccount(this,'Complete Social AI',15)"><div class="name">Complete Social AI</div><div class="comm">15% of total ticket</div></button>
+      <button class="account-btn" onclick="selectAccount(this,'Complete Social AI',15,'cs')"><div class="name">Complete Social AI</div><div class="comm">15% of total ticket</div></button>
     </div>
     <div id="fabien-program-wrap" style="display:none;margin-top:10px">
       <div class="card-title" style="margin-bottom:8px">Fabien Dating — program</div>
-      <div class="type-grid" style="grid-template-columns:1fr 1fr">
+      <div class="type-grid" style="grid-template-columns:1fr 1fr 1fr">
         <button type="button" class="type-btn" id="fabien-prog-other" onclick="selectFabienProgram('other')"><div class="tname">Other programs</div><div class="tdesc">15% of net revenue</div></button>
         <button type="button" class="type-btn" id="fabien-prog-2week" onclick="selectFabienProgram('2week')"><div class="tname">2-week ($500)</div><div class="tdesc">30% of net revenue</div></button>
+        <button type="button" class="type-btn" id="fabien-prog-3000" onclick="selectFabienProgram('3000offer')"><div class="tname">$3000 offer</div><div class="tdesc">$422 total commission</div></button>
       </div>
       <p class="field-note">Net revenue = total − 3.3% Stripe fee. Commission is paid on cash collected as it comes in.</p>
+    </div>
+    <div id="cs-program-wrap" style="display:none;margin-top:10px">
+      <div class="card-title" style="margin-bottom:8px">Complete Social AI — offer</div>
+      <div class="type-grid" style="grid-template-columns:1fr 1fr 1fr">
+        <button type="button" class="type-btn" id="cs-prog-standard" onclick="selectCSProgram('standard')"><div class="tname">Standard</div><div class="tdesc">15% of total ticket</div></button>
+        <button type="button" class="type-btn" id="cs-prog-2400" onclick="selectCSProgram('2400')"><div class="tname">$2400 offer</div><div class="tdesc">$400 total commission</div></button>
+        <button type="button" class="type-btn" id="cs-prog-3200" onclick="selectCSProgram('3200')"><div class="tname">$3200 offer</div><div class="tdesc">$500 total commission</div></button>
+      </div>
     </div>
   </div>
   <div class="card">
@@ -442,6 +451,11 @@ var account='AlwaysCoach', comm=10, callType='pitched', currentResult=null, open
 var fabienProgram='other';
 var STRIPE_FACTOR=1-0.033; // 3.3% Stripe fee deducted before commission on Fabien Dating
 var FABIEN_RATES={other:15,'2week':30};
+// Flat-fee offer tiers: total commission is a fixed dollar amount for a specific offer price
+// (already the final number to be paid, so no Stripe factor is applied on top of it)
+var FABIEN_FLAT={'3000offer':{price:3000,commission:422}};
+var csProgram='standard';
+var CS_FLAT={standard:{price:100,commission:15},'2400':{price:2400,commission:400},'3200':{price:3200,commission:500}};
 var selectedCallIds=new Set();
 function toggleCallSelect(id,checked){
   if(checked) selectedCallIds.add(id); else selectedCallIds.delete(id);
@@ -454,6 +468,8 @@ document.addEventListener('DOMContentLoaded',function(){
   if(d) d.value=new Date().toISOString().substring(0,10);
   var elOther=document.getElementById('fabien-prog-other');
   if(elOther) elOther.classList.add('active');
+  var elCsStd=document.getElementById('cs-prog-standard');
+  if(elCsStd) elCsStd.classList.add('active');
 });
 
 function showPage(id,btn){
@@ -466,21 +482,43 @@ function showPage(id,btn){
 function selectAccount(el,name,c,special){
   document.querySelectorAll('.account-btn').forEach(function(b){b.classList.remove('active');});
   el.classList.add('active'); account=name;
-  var wrap=document.getElementById('fabien-program-wrap');
+  var fabienWrap=document.getElementById('fabien-program-wrap');
+  var csWrap=document.getElementById('cs-program-wrap');
   if(special==='fabien'){
-    wrap.style.display='block';
+    fabienWrap.style.display='block';
+    csWrap.style.display='none';
     selectFabienProgram(fabienProgram||'other');
+  } else if(special==='cs'){
+    csWrap.style.display='block';
+    fabienWrap.style.display='none';
+    selectCSProgram(csProgram||'standard');
   } else {
-    wrap.style.display='none';
+    fabienWrap.style.display='none';
+    csWrap.style.display='none';
     comm=c;
   }
 }
 function selectFabienProgram(prog){
   fabienProgram=prog;
-  comm=Math.round(FABIEN_RATES[prog]*STRIPE_FACTOR*1000)/1000;
-  var elOther=document.getElementById('fabien-prog-other'), el2wk=document.getElementById('fabien-prog-2week');
+  if(FABIEN_FLAT[prog]){
+    var f=FABIEN_FLAT[prog];
+    comm=Math.round((f.commission/f.price*100)*1000)/1000;
+  } else {
+    comm=Math.round(FABIEN_RATES[prog]*STRIPE_FACTOR*1000)/1000;
+  }
+  var elOther=document.getElementById('fabien-prog-other'), el2wk=document.getElementById('fabien-prog-2week'), el3000=document.getElementById('fabien-prog-3000');
   if(elOther) elOther.classList.toggle('active',prog==='other');
   if(el2wk) el2wk.classList.toggle('active',prog==='2week');
+  if(el3000) el3000.classList.toggle('active',prog==='3000offer');
+}
+function selectCSProgram(prog){
+  csProgram=prog;
+  var f=CS_FLAT[prog];
+  comm=Math.round((f.commission/f.price*100)*1000)/1000;
+  var elStd=document.getElementById('cs-prog-standard'), el2400=document.getElementById('cs-prog-2400'), el3200=document.getElementById('cs-prog-3200');
+  if(elStd) elStd.classList.toggle('active',prog==='standard');
+  if(el2400) el2400.classList.toggle('active',prog==='2400');
+  if(el3200) el3200.classList.toggle('active',prog==='3200');
 }
 function selectType(el,type){
   document.querySelectorAll('.type-btn').forEach(function(b){b.classList.remove('active');});
@@ -575,7 +613,7 @@ async function runAnalysis(){
     var ts=(fd||cd)?((fd||cd)+'T12:00:00.000Z'):new Date().toISOString();
     currentResult={
       scores:parsed.scores,phases:parsed.phases,strengths:parsed.strengths||[],improvements:parsed.improvements||[],outcome:parsed.outcome||'unknown',
-      account:account,comm:comm,callType:callType,program:(account==='Fabien Dating'?fabienProgram:null),
+      account:account,comm:comm,callType:callType,program:(account==='Fabien Dating'?fabienProgram:(account==='Complete Social AI'?csProgram:null)),
       closer:finalCloser,client:finalClient,
       generatedRevenue:effectiveGenRev,cashCollected:effectiveCash,installments:installments,refund:effectiveRefund,
       fathom:fathomData||null,transcript:transcript,timestamp:ts,id:Date.now()
@@ -923,7 +961,9 @@ function renderDashboard(){
 
   // Table
   var list=document.getElementById('calls-list');
-  if(!calls.length){list.innerHTML='<div class="empty-state">No calls match your filters.</div>';return;}
+  if(!calls.length){
+    list.innerHTML='<div class="empty-state">No calls match your filters.</div>';
+  } else {
   var typeLbl={pitched:'Pitched',not_pitched:'Not Pitched',fdq:'FDQ',no_show:'No Show'};
   var typeCls={pitched:'badge-pitched',not_pitched:'badge-fdq',fdq:'badge-fdq',no_show:'badge-no'};
   var outLbl={closed:'Closed',no_close:'No close',follow_up:'Follow up',unknown:'Unknown'};
@@ -974,6 +1014,7 @@ function renderDashboard(){
     +'<td colspan="2"></td>'
     +'</tr>';
   list.innerHTML='<table class="calls-table"><thead><tr><th style="width:28px"></th><th>Date</th><th>Account</th><th>Client</th><th>Score</th><th>Cash</th><th>Revenue</th><th>Commission</th><th title="Score calibration">Cal.</th><th>Type / Outcome</th><th></th></tr></thead><tbody>'+rows+'</tbody><tfoot>'+tfootRow+'</tfoot></table>';
+  } // end calls.length check
 
   // Objections ranking
   var objPatterns=[
