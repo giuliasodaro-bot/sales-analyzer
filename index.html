@@ -728,25 +728,30 @@ function projectInstallments(call){
   var instAmt=Math.round(call.generatedRevenue/call.installments);
   var commAmt=instAmt*(call.comm||0)/100; // kept unrounded; rounded only when displayed/aggregated
   var callDate=new Date(call.timestamp);
-  // Use UTC year/month integer arithmetic (not Date.setMonth) so that a call date on the
+  // Use UTC year/month/day integer arithmetic (not Date.setMonth) so that a call date on the
   // 29th/30th/31st doesn't roll over into the wrong month when the target month is shorter
-  // (e.g. May 31 + 1 month must be June, not spill into July).
+  // (e.g. May 31 + 1 month must land on Jun 30, not spill into July), and so each installment
+  // gets an exact due date (not just a month bucket) for precise date-range filtering.
   var baseYear=callDate.getUTCFullYear();
   var baseMonth=callDate.getUTCMonth(); // 0-indexed
+  var baseDay=callDate.getUTCDate();
   function mkFor(i){
     var total=baseMonth+i;
     var y=baseYear+Math.floor(total/12);
-    var m=(total%12)+1; // 1-indexed
-    return y+'-'+(m<10?'0'+m:m);
+    var m0=((total%12)+12)%12; // 0-indexed target month
+    var lastDay=new Date(Date.UTC(y,m0+1,0)).getUTCDate();
+    var day=Math.min(baseDay,lastDay);
+    var iso=new Date(Date.UTC(y,m0,day)).toISOString();
+    return {date:iso.substring(0,10),month:iso.substring(0,7)};
   }
   // Single-installment deal (1/1): just the one payment, always shown as the "Active" row.
-  if(call.installments===1) return [{month:mkFor(0),amount:instAmt,commission:commAmt,first:true}];
+  if(call.installments===1){var d0=mkFor(0);return [{date:d0.date,month:d0.month,amount:instAmt,commission:commAmt,first:true}];}
   // Multi-installment deal already paid in full: nothing left to project.
   if(call.cashCollected>=call.generatedRevenue) return [];
   var rows=[];
   for(var i=0;i<call.installments;i++){
-    var mk=mkFor(i);
-    rows.push({month:mk,amount:instAmt,commission:commAmt,first:i===0});
+    var d=mkFor(i);
+    rows.push({date:d.date,month:d.month,amount:instAmt,commission:commAmt,first:i===0});
   }
   return rows;
 }
@@ -811,11 +816,11 @@ function saveNoShow(){
 
 function renderDashboard(){
   var calls=getFiltered();
-  var now=nowMonthKey();
+  var todayISO=new Date().toISOString().substring(0,10);
   var fd1=document.getElementById('f-date-from')?document.getElementById('f-date-from').value:'';
   var fd2=document.getElementById('f-date-to')?document.getElementById('f-date-to').value:'';
-  var rangeStart=fd1?fd1.substring(0,7):'0000-00';
-  var rangeEnd=fd2?fd2.substring(0,7):'9999-99';
+  var rangeStart=fd1||'0000-00-00';
+  var rangeEnd=fd2||'9999-99-99';
 
   var closed=calls.filter(function(c){return (c.outcome||'').toLowerCase()==='closed';});
   var taken=calls.filter(function(c){return c.callType!=='no_show';});
@@ -826,22 +831,7 @@ function renderDashboard(){
   var allClosed=loadCalls().filter(function(c){return (c.outcome||'').toLowerCase()==='closed';});
   var fa=document.getElementById('f-account')?document.getElementById('f-account').value:'';
   var noDateFilter=!fd1&&!fd2;
-  var todayMonth=now;
   var cashPeriod=0,cashPassive=0,commPeriod=0,totalGenerated=0;
-
-  // Build passive installment schedule from ALL closed calls (for prev months calc)
-  // passiveMap[month] = {amount, commission} — only months AFTER the call date
-  var passiveMap={};
-  allClosed.forEach(function(c){
-    if(fa&&c.account!==fa) return;
-    projectInstallments(c).forEach(function(r){
-      if(!r.first){ // only passive (months 2+)
-        if(!passiveMap[r.month]) passiveMap[r.month]={amount:0,commission:0};
-        passiveMap[r.month].amount+=r.amount;
-        passiveMap[r.month].commission+=r.commission;
-      }
-    });
-  });
 
   if(noDateFilter){
     // CASH PERIOD: first payments from all closed calls + passive installments due up to today
@@ -853,35 +843,35 @@ function renderDashboard(){
       cashPeriod+=c.cashCollected||0;
       commPeriod+=(c.cashCollected||0)*(c.comm||0)/100;
       totalGenerated+=c.generatedRevenue||0;
-    });
-    Object.keys(passiveMap).forEach(function(m){
-      if(m<=todayMonth){
-        cashPeriod+=passiveMap[m].amount;
-        commPeriod+=passiveMap[m].commission;
-      }
+      projectInstallments(c).forEach(function(r){
+        if(r.first) return; // months 2+ only
+        if(r.date<=todayISO){
+          cashPeriod+=r.amount;
+          commPeriod+=r.commission;
+        }
+      });
     });
   } else {
-    // CASH PERIOD: first payments (cashCollected) from closed calls within date range
-    // CASH PREV MONTHS: passive installments from calls closed BEFORE range but falling within range
+    // CASH PERIOD: first payments (cashCollected) from closed calls closed within date range (exact day)
+    // CASH PREV MONTHS: passive installments due within the exact date range, regardless of when the deal closed
     // COMMISSION: commission on period cash + commission on prev months cash
     // REVENUE GENERATED: contracted value of closed calls within date range
     allClosed.forEach(function(c){
       if(fa&&c.account!==fa) return;
       var cDate=(c.dateClosed||c.timestamp||'').substring(0,10);
-      var cMon=cDate.substring(0,7);
-      if(cMon>=rangeStart&&cMon<=rangeEnd){
+      if(cDate>=rangeStart&&cDate<=rangeEnd){
         // Call closed within selected range — count first payment and revenue
         cashPeriod+=c.cashCollected||0;
         commPeriod+=(c.cashCollected||0)*(c.comm||0)/100;
         totalGenerated+=c.generatedRevenue||0;
       }
-    });
-    // Passive installments from older calls falling within selected range
-    Object.keys(passiveMap).forEach(function(m){
-      if(m>=rangeStart&&m<=rangeEnd){
-        cashPassive+=passiveMap[m].amount;
-        commPeriod+=passiveMap[m].commission;
-      }
+      projectInstallments(c).forEach(function(r){
+        if(r.first) return; // months 2+ only
+        if(r.date>=rangeStart&&r.date<=rangeEnd){
+          cashPassive+=r.amount;
+          commPeriod+=r.commission;
+        }
+      });
     });
   }
 
@@ -979,15 +969,14 @@ function renderDashboard(){
       // Commission = commission on first payment (if in range) + passive installments in range
       var comm2=0;
       var cDate=(c.dateClosed||c.timestamp||'').substring(0,10);
-      var cMon=cDate.substring(0,7);
       // First payment commission
-      if(noDateFilter||(cMon>=rangeStart&&cMon<=rangeEnd)){
+      if(noDateFilter||(cDate>=rangeStart&&cDate<=rangeEnd)){
         comm2+=(c.cashCollected||0)*(c.comm||0)/100;
       }
       // Passive installments commission in range
       projectInstallments(c).forEach(function(r){
         if(r.first) return;
-        var inRange=noDateFilter?(r.month<=todayMonth):(r.month>=rangeStart&&r.month<=rangeEnd);
+        var inRange=noDateFilter?(r.date<=todayISO):(r.date>=rangeStart&&r.date<=rangeEnd);
         if(inRange) comm2+=r.commission;
       });
       totalCash+=c.cashCollected||0;
@@ -1073,9 +1062,8 @@ function renderDashboard(){
     if(!c.installments||c.installments<1) return;
     var insts=projectInstallments(c);
     if(!insts.length) return;
-    var callMon=monthKey(new Date(c.timestamp));
     insts.forEach(function(r,i){
-      var inRange=noDateFilter?(r.month<=todayMonth):(r.month>=rangeStart&&r.month<=rangeEnd);
+      var inRange=noDateFilter?(r.date<=todayISO):(r.date>=rangeStart&&r.date<=rangeEnd);
       if(!inRange) return;
       var instNum=i+1;
       recurringRows.push({
