@@ -1067,8 +1067,9 @@ function renderDashboard(){
       // Commission = commission on first payment (if in range) + passive installments in range
       var comm2=0;
       var cDate=(c.dateClosed||c.timestamp||'').substring(0,10);
+      var firstInRange=noDateFilter||(cDate>=rangeStart&&cDate<=rangeEnd);
       // First payment commission
-      if(noDateFilter||(cDate>=rangeStart&&cDate<=rangeEnd)){
+      if(firstInRange){
         comm2+=(c.cashCollected||0)*(c.comm||0)/100;
       }
       // Passive installments commission in range
@@ -1077,8 +1078,13 @@ function renderDashboard(){
         var inRange=noDateFilter?(r.date<=todayISO):(r.date>=rangeStart&&r.date<=rangeEnd);
         if(inRange) comm2+=r.commission;
       });
-      totalCash+=c.cashCollected||0;
-      totalRev+=c.generatedRevenue||0;
+      // Cash/Revenue totals in the footer only count a call's first payment when its closed
+      // date actually falls in the selected period — same rule the Commission column uses —
+      // so all three footer totals describe the same period consistently.
+      if(firstInRange){
+        totalCash+=c.cashCollected||0;
+        totalRev+=c.generatedRevenue||0;
+      }
       totalComm2+=comm2;
       var checked=selectedCallIds.has(c.id)?' checked':'';
       return '<tr onclick="openModal('+c.id+')">'
