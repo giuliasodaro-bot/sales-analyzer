@@ -236,6 +236,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div style="display:flex;gap:6px">
       <button class="btn-sm" onclick="rescoreAll()">Re-score all</button>
       <button class="btn-sm" onclick="openNoShowModal()">+ Log no-show</button>
+      <button class="btn-sm" onclick="openAdjModal()">+ Add bonus/payment</button>
       <button class="btn-sm" id="btn-rescore-selected" onclick="rescoreSelected()">Re-score selected (0)</button>
       <button class="btn-sm" onclick="cleanDuplicates()">Remove duplicates</button>
       <button class="btn-sm" onclick="exportData()">↓ Export</button>
@@ -324,6 +325,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div style="font-size:12px;font-weight:700;letter-spacing:.07em;color:var(--muted);margin-bottom:1rem">RECURRING PAYMENTS</div>
     <div id="recurring-list"></div>
   </div>
+  <!-- Manual bonuses / adjustments -->
+  <div class="card" id="adj-section" style="display:none;margin-top:1rem">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+      <div style="font-size:12px;font-weight:700;letter-spacing:.07em;color:var(--muted)">BONUSES & MANUAL PAYMENTS</div>
+      <button class="btn-sm" onclick="openAdjModal()">+ Add</button>
+    </div>
+    <div id="adj-list"></div>
+  </div>
 </div>
 
 <!-- NO-SHOW MODAL -->
@@ -349,6 +358,36 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div style="display:flex;gap:8px;margin-top:1.2rem;justify-content:flex-end">
       <button class="btn-sm" onclick="closeNoShowModal()">Cancel</button>
       <button class="btn-fetch" onclick="saveNoShow()">Save no-show</button>
+    </div>
+  </div>
+</div>
+
+<!-- MANUAL ADJUSTMENT MODAL (bonuses, extra payments, clawbacks not tied to a call) -->
+<div class="modal-overlay" id="adjModal" onclick="if(event.target.id==='adjModal')closeAdjModal()">
+  <div class="modal" style="max-width:420px">
+    <button class="modal-close" onclick="closeAdjModal()">✕</button>
+    <div style="font-size:17px;font-weight:600;margin-bottom:4px" id="adj-modal-title">Add bonus / manual payment</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:1rem">For money that isn't tied to a specific call — bonuses, one-off payouts, corrections. Use a negative amount for a clawback/deduction.</div>
+    <div style="display:grid;gap:10px">
+      <input type="hidden" id="adj-id" value=""/>
+      <div><label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px">DATE</label>
+        <input type="date" id="adj-date" class="form-input" style="width:100%"/></div>
+      <div><label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px">DESCRIPTION</label>
+        <input type="text" id="adj-label" class="form-input" placeholder="e.g. Q2 performance bonus" style="width:100%"/></div>
+      <div><label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px">ACCOUNT (optional)</label>
+        <select id="adj-account" class="form-input" style="width:100%">
+          <option value="">— Not account-specific —</option>
+          <option value="AlwaysCoach">AlwaysCoach</option>
+          <option value="Moves Method">Moves Method</option>
+          <option value="Fabien Dating">Fabien Dating</option>
+          <option value="Complete Social AI">Complete Social AI</option>
+        </select></div>
+      <div><label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px">AMOUNT ($)</label>
+        <input type="number" id="adj-amount" class="form-input" placeholder="500" step="0.01" style="width:100%"/></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:1.2rem;justify-content:flex-end">
+      <button class="btn-sm" onclick="closeAdjModal()">Cancel</button>
+      <button class="btn-fetch" onclick="saveAdjustment()">Save</button>
     </div>
   </div>
 </div>
@@ -563,6 +602,9 @@ async function fetchFathom(){
 // STORAGE
 function loadCalls(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');}catch(e){return[];}}
 function saveCalls(c){localStorage.setItem(STORAGE_KEY,JSON.stringify(c));}
+var ADJ_STORAGE_KEY='sales_adjustments';
+function loadAdjustments(){try{return JSON.parse(localStorage.getItem(ADJ_STORAGE_KEY)||'[]');}catch(e){return[];}}
+function saveAdjustments(a){localStorage.setItem(ADJ_STORAGE_KEY,JSON.stringify(a));}
 
 // HELPERS
 function cls(v){return v>=7.5?'hi':v>=5?'md':'lo';}
@@ -727,7 +769,7 @@ function projectInstallments(call){
   if(!call.generatedRevenue||!call.installments||call.installments<=0) return [];
   var instAmt=Math.round(call.generatedRevenue/call.installments);
   var commAmt=instAmt*(call.comm||0)/100; // kept unrounded; rounded only when displayed/aggregated
-  var callDate=new Date(call.timestamp);
+  var callDate=new Date(call.dateClosed||call.timestamp);
   // Use UTC year/month/day integer arithmetic (not Date.setMonth) so that a call date on the
   // 29th/30th/31st doesn't roll over into the wrong month when the target month is shorter
   // (e.g. May 31 + 1 month must land on Jun 30, not spill into July), and so each installment
@@ -814,6 +856,52 @@ function saveNoShow(){
   renderDashboard();
 }
 
+function openAdjModal(id){
+  document.getElementById('adj-id').value=id||'';
+  if(id){
+    var a=loadAdjustments().find(function(x){return x.id===id;});
+    if(a){
+      document.getElementById('adj-modal-title').textContent='Edit bonus / manual payment';
+      document.getElementById('adj-date').value=a.date||'';
+      document.getElementById('adj-label').value=a.label||'';
+      document.getElementById('adj-account').value=a.account||'';
+      document.getElementById('adj-amount').value=a.amount||'';
+    }
+  } else {
+    document.getElementById('adj-modal-title').textContent='Add bonus / manual payment';
+    document.getElementById('adj-date').value=new Date().toISOString().substring(0,10);
+    document.getElementById('adj-label').value='';
+    document.getElementById('adj-account').value='';
+    document.getElementById('adj-amount').value='';
+  }
+  document.getElementById('adjModal').classList.add('open');
+}
+function closeAdjModal(){
+  document.getElementById('adjModal').classList.remove('open');
+}
+function saveAdjustment(){
+  var id=document.getElementById('adj-id').value;
+  var date=document.getElementById('adj-date').value||new Date().toISOString().substring(0,10);
+  var label=document.getElementById('adj-label').value.trim()||'Manual payment';
+  var acct=document.getElementById('adj-account').value;
+  var amount=parseFloat(document.getElementById('adj-amount').value)||0;
+  var list=loadAdjustments();
+  if(id){
+    var idNum=Number(id);
+    list=list.map(function(a){return a.id===idNum?{id:idNum,date:date,label:label,account:acct,amount:amount}:a;});
+  } else {
+    list.unshift({id:Date.now(),date:date,label:label,account:acct,amount:amount});
+  }
+  saveAdjustments(list);
+  closeAdjModal();
+  renderDashboard();
+}
+function deleteAdjustment(id){
+  if(!confirm('Delete this entry?')) return;
+  saveAdjustments(loadAdjustments().filter(function(a){return a.id!==id;}));
+  renderDashboard();
+}
+
 function renderDashboard(){
   var calls=getFiltered();
   var todayISO=new Date().toISOString().substring(0,10);
@@ -874,6 +962,16 @@ function renderDashboard(){
       });
     });
   }
+
+  // Manual bonuses / adjustments (not tied to a call) — folded into Commission (period)
+  var allAdj=loadAdjustments();
+  var adjInRange=allAdj.filter(function(a){
+    if(fa&&a.account&&a.account!==fa) return false;
+    if(noDateFilter) return true;
+    return a.date>=rangeStart&&a.date<=rangeEnd;
+  });
+  var adjTotal=adjInRange.reduce(function(s,a){return s+(a.amount||0);},0);
+  commPeriod+=adjTotal;
 
   document.getElementById('kpi-cash-period').textContent='$'+cashPeriod.toLocaleString();
   document.getElementById('kpi-cash-passive').textContent='$'+cashPassive.toLocaleString();
@@ -1123,6 +1221,37 @@ function renderDashboard(){
     recurringList.innerHTML=thead+tbody+'</tbody><tfoot>'+tfoot+'</tfoot></table>';
   }else{
     recurringEl.style.display='none';
+  }
+
+  // Bonuses / manual adjustments
+  var adjEl=document.getElementById('adj-section');
+  var adjListEl=document.getElementById('adj-list');
+  if(adjInRange.length){
+    adjEl.style.display='block';
+    var adjRows=adjInRange.slice().sort(function(a,b){return (a.date<b.date)?1:-1;}).map(function(a){
+      var dt=new Date(a.date+'T12:00:00.000Z').toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'2-digit'});
+      var amtColor=a.amount<0?'var(--danger)':'var(--success)';
+      var amtStr=(a.amount<0?'-$':'$')+Math.abs(Math.round(a.amount)).toLocaleString();
+      return '<tr>'
+        +'<td style="padding:8px 8px;color:var(--muted);white-space:nowrap;font-size:13px">'+dt+'</td>'
+        +'<td style="padding:8px 8px;font-size:13px">'+a.label+'</td>'
+        +'<td style="padding:8px 8px;font-size:13px;color:var(--muted)">'+(a.account||'—')+'</td>'
+        +'<td style="padding:8px 8px;text-align:right;font-weight:600;color:'+amtColor+'">'+amtStr+'</td>'
+        +'<td style="padding:8px 8px;text-align:right;white-space:nowrap">'
+          +'<button class="btn-sm" style="padding:2px 8px;font-size:11px" onclick="openAdjModal('+a.id+')">Edit</button> '
+          +'<button class="btn-sm btn-danger" style="padding:2px 8px;font-size:11px" onclick="deleteAdjustment('+a.id+')">Delete</button>'
+        +'</td>'
+        +'</tr>';
+    }).join('');
+    adjListEl.innerHTML='<table style="width:100%;border-collapse:collapse"><thead><tr style="text-align:left;font-size:11px;color:var(--muted);border-bottom:1px solid var(--border-md)">'
+      +'<th style="padding:6px 8px">Date</th><th style="padding:6px 8px">Description</th><th style="padding:6px 8px">Account</th><th style="padding:6px 8px;text-align:right">Amount</th><th></th></tr></thead>'
+      +'<tbody>'+adjRows+'</tbody>'
+      +'<tfoot><tr style="border-top:2px solid var(--border-md);font-weight:700;background:var(--surface2)">'
+      +'<td colspan="3" style="padding:8px;font-size:12px">TOTAL</td>'
+      +'<td style="padding:8px;text-align:right;color:var(--success)">$'+Math.round(adjTotal).toLocaleString()+'</td><td></td>'
+      +'</tr></tfoot></table>';
+  } else {
+    adjEl.style.display='none';
   }
 }
 
@@ -1528,7 +1657,7 @@ function importData(e){
 }
 
 function clearAll(){
-  if(confirm('Delete all saved calls?')){localStorage.removeItem(STORAGE_KEY);}
+  if(confirm('Delete all saved calls?')){localStorage.removeItem(STORAGE_KEY);localStorage.removeItem(ADJ_STORAGE_KEY);}
 }
 </script>
 </body>
